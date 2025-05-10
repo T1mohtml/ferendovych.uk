@@ -2,7 +2,8 @@
     font-family: Arial, Helvetica, sans-serif;
  }
  button {
-    font-family: Arial, Helvetica, sans-serif;
+     text-decoration: none !important;
+     font-family: Arial, Helvetica, sans-serif;
     background-color: #4CAF50;
      color: white;
      border: none;
@@ -12,21 +13,27 @@
  }
 
  button:hover {
-    background-color: #45a049;
-    transform: scale(1.1);
      text-decoration: none !important;
+     border-bottom: none;
+     background-color: #45a049;
+    transform: scale(1.1);
  }
 
  button:focus {
-    outline: none; /* Removes the default outline when clicked */
-    box-shadow: 0 0 10px rgba(72, 204, 96, 0.7); /* Glow effect on focus */
+
      text-decoration: none !important;
+     border-bottom: none;
+     outline: none; /* Removes the default outline when clicked */
+    box-shadow: 0 0 10px rgba(72, 204, 96, 0.7); /* Glow effect on focus */
+
 }
 
 
  /* Your existing CSS styles for the button */
 /* Your existing CSS styles for the button */
 .secret-button {
+    text-decoration: none !important;
+    border-bottom: none;
     position: fixed; /* Fix the button on the screen */
     bottom: 10px;     /* 10px from the bottom of the page */
     left: 10px;       /* 10px from the left edge */
@@ -41,7 +48,7 @@
     text-align: center; /* Center text */
     line-height: 40px; /* Vertically center the text */
     cursor: pointer;  /* Pointer cursor */
-    text-decoration: none !important;
+
 }
 .center {
     display: block;
