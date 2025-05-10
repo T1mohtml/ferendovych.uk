@@ -3,9 +3,40 @@
  }
  button {
     font-family: Arial, Helvetica, sans-serif;
-   color: #001797;
-   background-color: #07a2ba;
+    background-color: #4CAF50;
+     color: white;
+     border: none;
+     cursor: pointer;
+     border-radius: 8px;
+     transition: all 0.3s ease;
  }
- label {
-   font-family: Arial, Helvetica, sans-serif;
-      }
+
+ button:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+ }
+
+ button:focus {
+    outline: none; /* Removes the default outline when clicked */
+    box-shadow: 0 0 10px rgba(72, 204, 96, 0.7); /* Glow effect on focus */
+}
+
+
+ /* Your existing CSS styles for the button */
+/* Your existing CSS styles for the button */
+.secret-button {
+    position: fixed; /* Fix the button on the screen */
+    bottom: 10px;     /* 10px from the bottom of the page */
+    left: 10px;       /* 10px from the left edge */
+    width: 80px;      /* Small width */
+    height: 50px;     /* Small height */
+    /* Keep the original color, no change */
+    color: white;     /* White text */
+    border: none;     /* No border */
+    border-radius: 50%; /* Circular button */
+    font-size: 14px;   /* Text size */
+    font-weight: bold; /* Bold text */
+    text-align: center; /* Center text */
+    line-height: 40px; /* Vertically center the text */
+    cursor: pointer;  /* Pointer cursor */
+}
