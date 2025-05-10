@@ -40,3 +40,7 @@
     line-height: 40px; /* Vertically center the text */
     cursor: pointer;  /* Pointer cursor */
 }
+.center {
+    display: block;
+    margin: 0 auto;
+}
