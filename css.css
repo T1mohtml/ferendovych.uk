@@ -14,11 +14,13 @@
  button:hover {
     background-color: #45a049;
     transform: scale(1.1);
+     text-decoration: none;
  }
 
  button:focus {
     outline: none; /* Removes the default outline when clicked */
     box-shadow: 0 0 10px rgba(72, 204, 96, 0.7); /* Glow effect on focus */
+     text-decoration: none;
 }
 
 
@@ -39,6 +41,7 @@
     text-align: center; /* Center text */
     line-height: 40px; /* Vertically center the text */
     cursor: pointer;  /* Pointer cursor */
+    text-decoration: none;
 }
 .center {
     display: block;
