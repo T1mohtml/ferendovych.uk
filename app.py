@@ -4,42 +4,51 @@ import sqlite3
 app = Flask(__name__)
 
 
-# Database connection function
-def get_db_connection():
-    conn = sqlite3.connect('database.db')  # Connect to the SQLite database
-    conn.row_factory = sqlite3.Row  # To return rows as dictionaries
-    return conn
+# Initialize the database
+def init_db():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''
+              CREATE TABLE IF NOT EXISTS names
+              (
+                  id
+                  INTEGER
+                  PRIMARY
+                  KEY,
+                  name
+                  TEXT
+              )
+              ''')
+    conn.commit()
+    conn.close()
 
 
-# Route for displaying and submitting the name
-@app.route("/name", methods=["GET", "POST"])
+# Home route
+@app.route("/", methods=["GET", "POST"])
 def name_input():
-    name = ""
     if request.method == "POST":
-        # Get the name from the form submission
-        name = request.form["name"]
+        name = request.form.get("name")
 
-        # Connect to the database and insert the name
-        conn = get_db_connection()
-        conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+        # Save the name to the database
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        c.execute('INSERT INTO names (name) VALUES (?)', (name,))
         conn.commit()
         conn.close()
 
-    # Render the page with the submitted name (if any)
-    return render_template("Name.html", name=name)
+        # After saving the name, fetch all names from the database
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        c.execute("SELECT name FROM names")
+        names = c.fetchall()
+        conn.close()
 
+        return render_template("Name.html", name=name, names=names)
 
-# Route for displaying all names from the database
-@app.route("/all_names")
-def all_names():
-    conn = get_db_connection()
-    # Get all the names from the database
-    names = conn.execute("SELECT * FROM names").fetchall()
-    conn.close()
-
-    # Render the page and pass the names to be displayed
-    return render_template("all_names.html", names=names)
+    # If the request is a GET (initial load), just show the form
+    return render_template("Name.html", names=[])
 
 
 if __name__ == "__main__":
+    init_db()  # Initialize the database when the app starts
     app.run(debug=True)
