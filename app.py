@@ -24,7 +24,7 @@ def init_db():
 
 
 # Home route
-@app.route("/", methods=["GET", "POST"])
+@app.route("/index.html", methods=["GET", "POST"])
 def name_input():
     if request.method == "POST":
         name = request.form.get("name")
