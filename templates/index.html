@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/css.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Your Name</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Enter Your Name</h1>
+
+    <!-- Form to submit name -->
+    <form method="POST">
+        <input type="text" name="name" placeholder="Your name" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Submitted Names:</h2>
+    <ul>
+        {% for name in names %}
+            <li>{{ name[0] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

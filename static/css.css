@@ -54,3 +54,10 @@
     display: block;
     margin: 0 auto;
 }
+input {
+    font-family: Arial, Helvetica, sans-serif;
+    border-radius: 8px;
+}
+.homebutton {
+    font-size: 14px;
+}
