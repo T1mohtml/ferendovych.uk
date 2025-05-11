@@ -1,50 +1,45 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 import sqlite3
 
 app = Flask(__name__)
 
 
-# Initialize the database
-def init_db():
-    with sqlite3.connect("database.db") as conn:
-        conn.execute("""
-                     CREATE TABLE IF NOT EXISTS names
-                     (
-                         id
-                         INTEGER
-                         PRIMARY
-                         KEY
-                         AUTOINCREMENT,
-                         name
-                         TEXT
-                         NOT
-                         NULL
-                     )
-                     """)
+# Database connection function
+def get_db_connection():
+    conn = sqlite3.connect('database.db')  # Connect to the SQLite database
+    conn.row_factory = sqlite3.Row  # To return rows as dictionaries
+    return conn
 
 
-# Handle the /name route (for GET and POST requests)
+# Route for displaying and submitting the name
 @app.route("/name", methods=["GET", "POST"])
 def name_input():
+    name = ""
     if request.method == "POST":
-        # Get the name from the form
-        name = request.form.get("name", "").strip()
+        # Get the name from the form submission
+        name = request.form["name"]
 
-        if name:
-            # Insert the name into the database
-            with sqlite3.connect("database.db") as conn:
-                conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+        # Connect to the database and insert the name
+        conn = get_db_connection()
+        conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+        conn.commit()
+        conn.close()
 
-        return redirect("/name")  # After submission, reload the page
+    # Render the page with the submitted name (if any)
+    return render_template("Name.html", name=name)
 
-    # Fetch all names from the database for GET request
-    with sqlite3.connect("database.db") as conn:
-        names = conn.execute("SELECT name FROM names").fetchall()
 
-    # Render the index.html template and pass the names
-    return render_template("index.html", names=names)
+# Route for displaying all names from the database
+@app.route("/all_names")
+def all_names():
+    conn = get_db_connection()
+    # Get all the names from the database
+    names = conn.execute("SELECT * FROM names").fetchall()
+    conn.close()
+
+    # Render the page and pass the names to be displayed
+    return render_template("all_names.html", names=names)
 
 
 if __name__ == "__main__":
-    init_db()  # Initialize the database when app starts
-    app.run(host="0.0.0.0", port=8000)  # Run Flask app on localhost:8000
+    app.run(debug=True)
