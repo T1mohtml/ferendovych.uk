@@ -73,3 +73,16 @@ a:active {
   color: inherit;
   outline: none;
 }
+
+.big-button {
+  padding: 15px 30px;      /* Increases size inside the button */
+  font-size: 18px;
+    border-radius: 20px;
+  cursor: pointer;         /* Shows a hand cursor on hover */
+}
+.little-big-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+}
