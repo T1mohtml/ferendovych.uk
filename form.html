@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="static/css.css">
+    <title>Submit Name & Message</title>
+</head>
+<body>
+
+<form action="submit.php" method="post">
+    <label for="name"><h1>Type your name!</h1></label>
+    <input type="text" id="name" name="name" placeholder="Your Name!" required><br><br>
+
+    <label for="message"><h1>Type your flork idea here!</h1></label>
+    <textarea id="message" name="message" placeholder="Your flork idea here..." required></textarea><br><br>
+
+    <div class="submit">
+    <button type="submit">Submit</button>
+    </div>
+</form>
+
+<a href="view.php">
+    <input type="button" value="View messages!">
+</a>
+
+</body>
+</html>

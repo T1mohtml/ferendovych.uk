@@ -1,3 +1,4 @@
 *.cs
 *.sln
 clear_db.py
+.env
