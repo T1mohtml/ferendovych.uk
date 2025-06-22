@@ -2,4 +2,4 @@
 nixPkgs = ["php80", "php81", "php74"]
 
 [start]
-cmd = "php -S 0.0.0.0:8080 -t ."
+cmd = "nix-env -qaP | grep php && sleep 3600"
