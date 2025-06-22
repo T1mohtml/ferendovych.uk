@@ -2,3 +2,4 @@
 *.sln
 clear_db.py
 .env
+markdown (not in git)

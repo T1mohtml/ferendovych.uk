@@ -51,7 +51,7 @@ $conn->close();
   <?php if ($message): ?>
     <p><strong><?= htmlspecialchars($message) ?></strong></p>
   <?php endif; ?>
-
+        <a href="index.html"><button>Home</button>
   <form method="post" action="">
     <?php foreach ($ideas as $idea): ?>
       <label>
