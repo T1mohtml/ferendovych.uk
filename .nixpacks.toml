@@ -1,5 +1,5 @@
-[phases.setup]
-nixPkgs = ["php80", "php81", "php74"]
+[phases.setup.packages]
+pkgs = ["php"]
 
-[start]
-cmd = "nix-env -qaP | grep php && sleep 3600"
+[phases.start.commands]
+cmds = ["php -S 0.0.0.0:8080 -t ."]
