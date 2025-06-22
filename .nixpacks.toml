@@ -1,5 +1,5 @@
 [phases.setup.packages]
 pkgs = ["php"]
 
-[phases.start.commands]
-cmds = ["php -S 0.0.0.0:8080 -t ."]
+[phases.start]
+command = "php -S 0.0.0.0:${PORT:-8080} -t ."
