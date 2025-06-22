@@ -1,0 +1,6 @@
+[phases.setup]
+nixPkgs = ["php"]
+
+[start]
+cmd = "php -S 0.0.0.0:8080 -t ."
+gti
