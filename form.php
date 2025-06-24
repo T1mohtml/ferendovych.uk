@@ -1,3 +1,8 @@
+<?php
+// No backend logic here, just showing the form.
+// You can add PHP above if needed later.
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,7 +11,7 @@
 </head>
 <body>
 
-<form action="submit.php" method="post">
+<form action="submit_handler.php" method="post">
     <label for="name"><h1>Type your name!</h1></label>
     <input type="text" id="name" name="name" placeholder="Your Name!" required><br><br>
 
@@ -14,7 +19,7 @@
     <textarea id="message" name="message" placeholder="Your flork idea here..." required></textarea><br><br>
 
     <div class="submit">
-    <button type="submit">Submit</button>
+        <button type="submit">Submit</button>
     </div>
 </form>
 

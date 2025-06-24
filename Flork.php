@@ -8,11 +8,11 @@
 </head>
 <body>
 
-<a href="form.html">
+<a href="form.php">
     <button class="center big-button">Suggest Some ideas for drawing!(florks)</button>
 </a>
 <a href="VOT.php"><button class="center big-button">Go to our VOT box</button></a>
-<a href="index.html">
+<a href="index.php">
     <button class="center little-big-button">Home</button>
 </a>
 
