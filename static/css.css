@@ -1,125 +1,136 @@
-
- h1, h3, p, div, h4 {
+/* Font styling for common elements */
+h1, h3, p, div, h4, input {
     font-family: Arial, Helvetica, sans-serif;
- }
- button {
-     text-decoration: none !important;
-     font-family: Arial, Helvetica, sans-serif;
-    background-color: #4CAF50;
-     color: white;
-     border: none;
-     cursor: pointer;
-     border-radius: 8px;
-     transition: all 0.3s ease;
- }
-
- button:hover {
-     text-decoration: none !important;
-     border-bottom: none;
-     background-color: #45a049;
-    transform: scale(1.1);
- }
-
- button:focus {
-
-     text-decoration: none !important;
-     border-bottom: none;
-     outline: none; /* Removes the default outline when clicked */
-    box-shadow: 0 0 10px rgba(72, 204, 96, 0.7); /* Glow effect on focus */
-
 }
 
+/* General button styles */
+button {
+    text-decoration: none !important;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
 
- /* Your existing CSS styles for the button */
-/* Your existing CSS styles for the button */
+button:hover {
+    text-decoration: none !important;
+    border-bottom: none;
+    background-color: #45a049;
+    transform: scale(1.1);
+}
+
+button:focus {
+    text-decoration: none !important;
+    border-bottom: none;
+    outline: none;
+    box-shadow: 0 0 10px rgba(72, 204, 96, 0.7);
+}
+
+/* Secret button fixed on screen */
 .secret-button {
     text-decoration: none !important;
     border-bottom: none;
-    position: fixed; /* Fix the button on the screen */
-    bottom: 10px;     /* 10px from the bottom of the page */
-    left: 10px;       /* 10px from the left edge */
-    width: 80px;      /* Small width */
-    height: 50px;     /* Small height */
-    /* Keep the original color, no change */
-    color: white;     /* White text */
-    border: none;     /* No border */
-    border-radius: 50%; /* Circular button */
-    font-size: 14px;   /* Text size */
-    font-weight: bold; /* Bold text */
-    text-align: center; /* Center text */
-    line-height: 40px; /* Vertically center the text */
-    cursor: pointer;  /* Pointer cursor */
-
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    width: 80px;
+    height: 50px;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
 }
+
+/* Centered block element */
 .center {
     display: block;
     margin: 0 auto;
     text-align: center;
 }
+
+/* Input styling */
 input {
-    font-family: Arial, Helvetica, sans-serif;
     border-radius: 8px;
 }
+
+/* Home button specific style */
 .homebutton {
     font-size: 14px;
 }
+
+/* Anchor link styles */
 a {
-  text-decoration: none !important;
-  color: inherit; /* Keeps the text color consistent */
+    text-decoration: none !important;
+    color: inherit;
 }
 
 a:hover,
 a:focus,
 a:active {
-  text-decoration: none !important;
-  color: inherit;
-  outline: none;
+    text-decoration: none !important;
+    color: inherit;
+    outline: none;
 }
 
+/* Big button */
 .big-button {
-  padding: 15px 30px;      /* Increases size inside the button */
-  font-size: 18px;
+    padding: 15px 30px;
+    font-size: 18px;
     border-radius: 20px;
-  cursor: pointer;         /* Shows a hand cursor on hover */
+    cursor: pointer;
 }
-.little-big-button, {
+
+/* Little-big-button (fixed trailing comma issue) */
+.little-big-button {
     padding: 10px 20px;
     font-size: 14px;
     border-radius: 20px;
     cursor: pointer;
 }
+
+/* Not found text */
 .notfound {
     font-size: 50px;
     color: #a50000;
 }
+
 .notfound1 {
     font-size: 70px;
 }
+
+/* Sliding text animation */
 .sliding-text-container {
-  width: 100%;
-  overflow: hidden;
-  background: #fff;
-  color: #222;
-  font-weight: bold;
-  font-size: 2.5rem; /* bigger font */
-  white-space: nowrap;
-  box-sizing: border-box;
-  padding: 10px 0;
-  margin-bottom: 20px;
-  font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    color: #222;
+    font-weight: bold;
+    font-size: 2.5rem;
+    white-space: nowrap;
+    box-sizing: border-box;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .sliding-text {
-  display: inline-block;
-  padding-left: 100%;
-  animation: slide-left 15s linear infinite;
+    display: inline-block;
+    padding-left: 100%;
+    animation: slide-left 15s linear infinite;
 }
 
 @keyframes slide-left {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }
