@@ -98,8 +98,8 @@ a:active {
 .sliding-text-container {
   width: 100%;
   overflow: hidden;
-  background: #222;
-  color: #fff;
+  background: #fff;
+  color: #222;
   font-weight: bold;
   font-size: 1.2rem;
   white-space: nowrap;
