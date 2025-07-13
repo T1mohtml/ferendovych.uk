@@ -32,8 +32,8 @@
         <button class="center">My github repo</button>
     </a>
 
-    <a href="blog.php">
-        <button class="center">My Blog!</button>
+    <a href="AboutMe.php">
+        <button class="center">About Me!</button>
     </a>
 
     <a href="Secret.php">
