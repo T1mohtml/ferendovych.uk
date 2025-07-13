@@ -101,7 +101,7 @@ a:active {
   background: #fff;
   color: #222;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 2.5rem; /* bigger font */
   white-space: nowrap;
   box-sizing: border-box;
   padding: 10px 0;
