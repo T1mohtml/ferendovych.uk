@@ -16,7 +16,12 @@
 </head>
 <body>
 
-    <h1 class="center">THE WEBSITE IS W.I.P (WORK IN PROGRESS) SOME THINGS WILL NOT WORK!</h1>
+<div class="sliding-text-container">
+  <div class="sliding-text">
+    THE WEBSITE IS W.I.P (WORK IN PROGRESS) SOME THINGS WILL NOT WORK!
+  </div>
+</div>
+
     <h1 style="text-align:center;">Hello</h1>
 
     <a href="https://www.youtube.com/channel/UCFF7AsiSQgmh5ZP8u7GBWvQ">
