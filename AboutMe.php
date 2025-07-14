@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>My Blog</title>
+    <title>About Me!</title>
     <link rel="stylesheet" href="static/css.css" />
 </head>
 <body>
