@@ -18,7 +18,7 @@
 
 <div class="sliding-text-container">
   <div class="sliding-text">
-    THE WEBSITE IS W.I.P (WORK IN PROGRESS) SOME THINGS WILL NOT WORK!
+    THE WEBSITE IS W.I.P (WORK IN PROGRESS) SOME THINGS MAY NOT WORK!
   </div>
 </div>
 
