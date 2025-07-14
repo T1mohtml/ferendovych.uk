@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <h1>My blog!</h1>
+    <h1>About Me!</h1>
     <hr>
     <h3>Hi, my name is Timo. I started coding around 2022-ish, and the story is fascinating:</h3>
     <h4>
