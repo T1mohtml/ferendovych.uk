@@ -1,0 +1,4 @@
+# No HTTPS redirect here — Cloudflare handles it
+AddDefaultCharset UTF-8
+Options -Indexes
+
