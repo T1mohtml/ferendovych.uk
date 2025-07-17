@@ -87,7 +87,7 @@
     </main>
 
     <footer>
-        &copy; 2025 Timo Ferendovych. All rights reserved.
+        &copy; 2025-2025 Timo Ferendovych. All rights reserved.
     </footer>
 </body>
 </html>
