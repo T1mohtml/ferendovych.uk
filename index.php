@@ -34,6 +34,7 @@
             padding: 1em;
             background-color: #eee;
             margin-top: 2em;
+            font-family: Helvetica;
         }
     </style>
 </head>
