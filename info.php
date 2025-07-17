@@ -1,9 +1,22 @@
 <?php
-$allowed_ip = '100.88.59.37'; // Replace with your actual IP
+$allowed_ip = '213.5.192.251'; // your real IP
 
-if ($_SERVER['REMOTE_ADDR'] === $allowed_ip) {
+function getRealIp() {
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        return $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+    } else {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+}
+
+$visitorIp = getRealIp();
+
+if ($visitorIp === $allowed_ip) {
     phpinfo();
 } else {
-    echo "Access denied";
     http_response_code(403);
+    echo "Access denied";
 }
+?>
