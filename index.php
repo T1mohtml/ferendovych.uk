@@ -13,6 +13,15 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="static/css.css">
+
+    <style>
+        footer {
+            text-align: center;
+            padding: 1em;
+            background-color: #eee;
+            margin-top: 2em;
+        }
+    </style>
 </head>
 <body>
 
@@ -36,7 +45,7 @@
         <button class="center">About Me!</button>
     </a>
     <a href="portfolio.php">
-        <button class="center">My Portfolio!
+        <button class="center">My Portfolio!</button>
     </a>
 
     <a href="Secret.php">
@@ -50,5 +59,10 @@
     <a href="WeatherChecker.dmg" download class="center">
         <h1>Download my app (click me!) (you can type a city name and it will show live weather data for it!)</h1>
     </a>
+
+<footer>
+    &copy; 2025 Timo Ferendovych. All rights reserved.
+</footer>
+
 </body>
 </html>
