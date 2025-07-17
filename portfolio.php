@@ -63,7 +63,7 @@
         <div class="project">
             <strong>🌦 Weather App</strong><br>
             A simple Python app that fetches weather data using an API.<br>
-            <a href="https://github.com/T1mohtml/My_python_projects_and_VSCode_projects" target="_blank">View on GitHub</a>
+            <a href="https://github.com/T1mohtml/My_python_projects_and_VSCode_projects/releases/tag/1.0.0" target="_blank">View on GitHub</a>
         </div>
 
         <div class="project">
