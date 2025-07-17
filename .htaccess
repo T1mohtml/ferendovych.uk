@@ -1,8 +1,10 @@
 # No HTTPS redirect here — Cloudflare handles it
 AddDefaultCharset UTF-8
 Options -Indexes
-AuthType Basic
-AuthName "Restricted Area"
-AuthUserFile /var/www/html/.htpasswd
-Require valid-user
 
+<Files "info.php">
+    AuthType Basic
+    AuthName "Restricted Area"
+    AuthUserFile /var/www/html/.htpasswd
+    Require valid-user
+</Files>
