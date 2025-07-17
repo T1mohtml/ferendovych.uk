@@ -1,5 +1,5 @@
 <?php
-$allowed_ip = '213.5.192.251'; // your real IP
+$allowed_ips = ['100.88.59.37', '100.66.159.29', '213.5.192.251'];
 
 function getRealIp() {
     if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
@@ -13,10 +13,10 @@ function getRealIp() {
 
 $visitorIp = getRealIp();
 
-if ($visitorIp === $allowed_ip) {
+if (in_array($visitorIp, $allowed_ips)) {
     phpinfo();
 } else {
-    http_response_code(403);
     echo "Access denied";
+    http_response_code(403);
 }
 ?>
