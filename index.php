@@ -36,7 +36,8 @@
         <button class="center">About Me!</button>
     </a>
     <a href="portfolio.php">
-        <button class="center">My Portfolio!<
+        <button class="center">My Portfolio!
+    </a>
 
     <a href="Secret.php">
         <button class="secret-button">Click me!</button>
