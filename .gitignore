@@ -1,5 +1,5 @@
 *.cs
 *.sln
 clear_db.py
-.env
+.env.ini
 markdown (not in git)

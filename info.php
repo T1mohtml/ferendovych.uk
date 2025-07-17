@@ -1,22 +1,22 @@
 <?php
-$allowed_ips = ['100.88.59.37', '100.66.159.29', '213.5.192.251'];
+// Load .env file — make sure path is correct
+$env = parse_ini_file(__DIR__ . '/.env.ini'); // or .env if you format it like ini
 
-function getRealIp() {
-    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-        return $_SERVER['HTTP_CF_CONNECTING_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        return explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-    } else {
-        return $_SERVER['REMOTE_ADDR'];
-    }
+// Get credentials from env
+$valid_user = $env['AUTH_USER'] ?? 'admin';
+$valid_pass = $env['AUTH_PASS'] ?? 'password';
+
+// Check HTTP Basic Auth headers
+if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
+    $_SERVER['PHP_AUTH_USER'] !== $valid_user ||
+    $_SERVER['PHP_AUTH_PW'] !== $valid_pass) {
+
+    header('WWW-Authenticate: Basic realm="Restricted Area"');
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'Authentication required.';
+    exit;
 }
 
-$visitorIp = getRealIp();
-
-if (in_array($visitorIp, $allowed_ips)) {
-    phpinfo();
-} else {
-    echo "Access denied";
-    http_response_code(403);
-}
+// If passed auth, show phpinfo
+phpinfo();
 ?>
