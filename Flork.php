@@ -1,3 +1,6 @@
+<?php
+include_once ("captain_hook.php");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

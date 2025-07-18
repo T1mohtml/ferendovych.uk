@@ -1,5 +1,5 @@
 <?php
-// No PHP logic needed here, just static content
+include_once ("captain_hook.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">

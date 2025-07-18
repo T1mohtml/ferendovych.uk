@@ -1,5 +1,5 @@
 <?php
-// Load .env file — make sure path is correct
+include_once ("captain_hook.php");
 $env = parse_ini_file(__DIR__ . '/.env.ini'); // or .env if you format it like ini
 
 // Get credentials from env

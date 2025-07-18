@@ -1,5 +1,5 @@
 <?php
-    // no php logic here
+include_once ("captain_hook.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">

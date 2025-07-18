@@ -1,5 +1,5 @@
 <?php
-// You can add any PHP logic above the HTML if needed
+include_once ("captain_hook.php");
 ?>
 <!DOCTYPE html>
 <html>

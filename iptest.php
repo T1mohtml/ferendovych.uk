@@ -1,4 +1,5 @@
 <?php
+include_once ("captain_hook.php");
 function getRealIp() {
     if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
         return $_SERVER['HTTP_CF_CONNECTING_IP'];  // Cloudflare sends real IP here
