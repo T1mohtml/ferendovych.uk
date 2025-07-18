@@ -8,3 +8,11 @@ Options -Indexes
     AuthUserFile /var/www/html/.htpasswd
     Require valid-user
 </Files>
+RewriteEngine On
+
+# Internally rewrite /portfolio to /portfolio.php
+RewriteRule ^portfolio$ portfolio.php [L]
+
+# Optional: redirect /portfolio.php to /portfolio (clean URL)
+RewriteCond %{THE_REQUEST} \s/portfolio\.php [NC]
+RewriteRule ^portfolio\.php$ /portfolio [R=301,L]
