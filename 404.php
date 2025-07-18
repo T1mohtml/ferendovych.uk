@@ -47,6 +47,6 @@ http_response_code(404);
 <body>
     <h1>404 Not Found</h1>
     <p>Awww shucks! This place does not exist <span class="emoji">D:</span></p>
-    <a href="index.php" class="button">Take me back home </a>
+    <a href="/" class="button">Take me back home </a>
 </body>
 </html>

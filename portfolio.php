@@ -4,8 +4,8 @@ include_once ("captain_hook.php");
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Timo Ferendovych – Portfolio</title>
     <style>
         body {
@@ -42,12 +42,30 @@ include_once ("captain_hook.php");
             background-color: #eee;
             margin-top: 2em;
         }
+        /* Home button styling */
+        .home-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5em 1.2em;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-top: 0.5em;
+        }
+        .home-button:hover {
+            background-color: #217dbb;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>Hi, I'm Timo 👋</h1>
         <p>10-year-old developer, Linux user & future software engineer</p>
+        <a href="/" class="home-button" aria-label="Home">Home</a>
     </header>
 
     <main>
