@@ -20,7 +20,7 @@ include_once ("captain_hook.php");
 <body>
 
     <h1 style="text-align:center;">You have reached the secret page, Congratulations</h1>
-    <a href="index.php">
+    <a href="/">
         <button class="center">Home</button>
     </a>
 

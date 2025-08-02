@@ -22,7 +22,7 @@
     <h3>This website repo: <a href="https://github.com/T1mohtml/website2" target="_blank" rel="noopener noreferrer">Repo</a></h3>
     <h3>Pronouns: he/him</h3>
     <h3>Age: 10 (Soon 11!)</h3>
-    <a href="index.php"><button>Home</button></a>
+    <a href="/"><button>Home</button></a>
 
 </body>
 </html>
