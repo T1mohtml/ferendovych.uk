@@ -134,3 +134,13 @@ a:active {
         transform: translateX(-100%);
     }
 }
+
+@media (max-width: 600px) {
+  button, 
+  .secret-button,
+  .homebutton,
+  .little-big-button {
+    padding: 18px 30px !important;
+    font-size: 18px !important;
+  }
+}
