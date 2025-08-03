@@ -6,6 +6,7 @@ include_once ("captain_hook.php");
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="static/css.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <img class="center" src="IMG_1324.png" alt="Florks" width="500" height="500">
 </head>

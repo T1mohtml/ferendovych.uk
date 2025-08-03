@@ -7,6 +7,8 @@
     <meta charset="UTF-8" />
     <title>About Me!</title>
     <link rel="stylesheet" href="static/css.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
 </head>
 <body>
 

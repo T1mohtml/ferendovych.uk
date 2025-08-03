@@ -43,6 +43,7 @@ $conn->close();
 <head>
   <link rel="stylesheet" href="static/css.css">
   <title>Vote for Ideas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 

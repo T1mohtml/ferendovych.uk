@@ -13,7 +13,8 @@ include_once ("captain_hook.php");
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="static/css.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         /* Sticky footer fix */
         html, body {
