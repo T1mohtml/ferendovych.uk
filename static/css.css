@@ -1,22 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
+/* Base layout */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: #1e1f26;
     color: #f1f1f1;
-    margin: 0;
-    padding: 0;
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Container */
-.container {
+.content {
+    flex: 1;
     max-width: 960px;
     margin: 0 auto;
     padding: 40px 20px;
 }
 
-/* Headings */
+/* Typography */
 h1, h2, h3, h4 {
     font-weight: 600;
     margin-top: 1.5em;
@@ -27,10 +35,7 @@ h1 {
     font-size: 2.5rem;
     border-bottom: 2px solid #444;
     padding-bottom: 0.3em;
-}
-
-h2 {
-    font-size: 2rem;
+    text-align: center;
 }
 
 p {
@@ -50,6 +55,9 @@ button {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: block;
+    margin: 16px auto;
+    text-align: center;
 }
 
 button:hover {
@@ -62,21 +70,25 @@ button:focus {
     box-shadow: 0 0 0 3px rgba(121, 134, 203, 0.5);
 }
 
-/* Inputs */
-input[type="text"], input[type="email"], textarea {
-    width: 100%;
-    padding: 10px 14px;
-    margin: 10px 0 20px;
-    border: 1px solid #333;
-    border-radius: 6px;
-    background-color: #2b2c36;
-    color: #eee;
-    transition: border 0.3s ease;
+/* Big button link */
+a.big-button {
+    display: block;
+    padding: 20px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #5c6bc0, #3949ab);
+    color: white;
+    text-align: center;
+    border-radius: 12px;
+    margin: 30px auto;
+    width: fit-content;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, background 0.3s ease;
 }
 
-input:focus, textarea:focus {
-    border-color: #7986cb;
-    outline: none;
+a.big-button:hover {
+    background: linear-gradient(135deg, #7986cb, #303f9f);
+    transform: scale(1.05);
 }
 
 /* Links */
@@ -90,8 +102,41 @@ a:hover {
     color: #c1e0ff;
 }
 
-/* Utility */
-.center {
+/* Footer */
+footer {
+    padding: 1em;
+    background-color: #1e1f26;
+    color: #aaa;
     text-align: center;
-    margin-top: 2em;
+    font-size: 14px;
+    border-top: 1px solid #333;
+}
+
+.sliding-text-container {
+    width: 100%;
+    overflow: hidden;
+    background-color: #3949ab;
+    padding: 0.5em 0;
+    margin-bottom: 2em;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(57, 73, 171, 0.5);
+}
+
+.sliding-text {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%; /* Start off screen right */
+    animation: slide-left 15s linear infinite;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #e1e1e6;
+}
+
+@keyframes slide-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }

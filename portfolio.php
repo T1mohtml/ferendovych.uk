@@ -7,57 +7,164 @@ include_once ("captain_hook.php");
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Timo Ferendovych – Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <style>
+        /* Reset and base */
         body {
-            font-family: Arial, sans-serif;
-            margin: 0; padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background-color: #1e1f26;
+            color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
         header {
-            background-color: #3b5998;
-            color: white;
-            padding: 1em 2em;
+            background: linear-gradient(135deg, #5c6bc0, #3949ab);
+            padding: 2em 1em;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
-        main {
-            padding: 2em;
-            max-width: 900px;
-            margin: auto;
+
+        header h1 {
+            margin: 0 0 0.25em 0;
+            font-weight: 600;
+            font-size: 2.5rem;
+            color: #fff;
         }
-        h2 {
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 0.3em;
+
+        header p {
+            margin: 0 0 1em 0;
+            font-weight: 400;
+            color: #cfd8dc;
+            font-size: 1.1rem;
         }
-        .project {
-            margin-bottom: 1.5em;
-        }
-        a {
-            color: #3b5998;
+
+        .home-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.6em 1.5em;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
             text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
         }
+
+        .home-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        main {
+            max-width: 900px;
+            margin: 2em auto 3em auto;
+            padding: 0 1em;
+            flex-grow: 1;
+        }
+
+        h2 {
+            font-weight: 600;
+            font-size: 2rem;
+            color: #e1e1e6;
+            border-bottom: 2px solid #3949ab;
+            padding-bottom: 0.3em;
+            margin-bottom: 1em;
+        }
+
+        p, li {
+            font-weight: 400;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 0.5em;
+        }
+
+        ul li {
+            margin-bottom: 0.8em;
+        }
+
+        ul li a {
+            color: #90caf9;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        ul li a:hover {
+            color: #c1e0ff;
+        }
+
+        .project {
+            background-color: #2b2c36;
+            border-radius: 10px;
+            padding: 1.2em 1.5em;
+            margin-bottom: 1.5em;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project strong {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 0.5em;
+            color: #7986cb;
+        }
+
+        .project a {
+            color: #90caf9;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .project a:hover {
+            color: #c1e0ff;
+            text-decoration: underline;
+        }
+
+        .project:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(57, 73, 171, 0.6);
+        }
+
         footer {
             text-align: center;
             padding: 1em;
-            background-color: #eee;
-            margin-top: 2em;
+            background-color: #22242f;
+            color: #777;
+            font-size: 0.9rem;
+            box-shadow: inset 0 1px 0 #3949ab;
+            user-select: none;
         }
-        /* Home button styling */
-        .home-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 0.5em 1.2em;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-            display: inline-block;
-            margin-top: 0.5em;
-        }
-        .home-button:hover {
-            background-color: #217dbb;
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            main {
+                margin: 1em;
+                padding: 0 0.5em;
+            }
+            .home-button {
+                width: 100%;
+                padding: 1em 0;
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
@@ -79,27 +186,26 @@ include_once ("captain_hook.php");
         <h2>My Projects</h2>
 
         <div class="project">
-            <strong>🌦 Weather App</strong><br>
-            A simple Python app that fetches weather data using an API.<br>
-            <a href="https://github.com/T1mohtml/My_python_projects_and_VSCode_projects/releases/tag/1.0.0" target="_blank">View on GitHub</a>
+            <strong>🌦 Weather App</strong>
+            <p>A simple Python app that fetches weather data using an API.</p>
+            <a href="https://github.com/T1mohtml/My_python_projects_and_VSCode_projects/releases/tag/1.0.0" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
 
         <div class="project">
-            <strong>🎮 TicTacToe Game</strong><br>
-            A classic 2-player game built in Python.<br>
-            Coming soon!
+            <strong>🎮 TicTacToe Game</strong>
+            <p>A classic 2-player game built in Python.<br>Coming soon!</p>
         </div>
 
         <div class="project">
-            <strong>📱 My Website</strong><br>
-            I built and maintain my own website using php and host it at ferendovych.uk.<br>
-            <a href="https://ferendovych.uk" target="_blank">Visit my site</a>
+            <strong>📱 My Website</strong>
+            <p>I built and maintain my own website using php and host it at ferendovych.uk.</p>
+            <a href="https://github.com/T1mohtml/ferendovych.uk" target="_blank" rel="noopener noreferrer">Repo for the website</a>
         </div>
 
         <h2>Contact</h2>
         <ul>
-            <li><a href="https://github.com/T1mohtml" target="_blank">GitHub: T1mohtml</a></li>
-            <li><a href="https://www.youtube.com/channel/UCFF7AsiSQgmh5ZP8u7GBWvQ" target="_blank">YouTube Channel</a></li>
+            <li><a href="https://github.com/T1mohtml" target="_blank" rel="noopener noreferrer">GitHub: T1mohtml</a></li>
+            <li><a href="https://www.youtube.com/channel/UCFF7AsiSQgmh5ZP8u7GBWvQ" target="_blank" rel="noopener noreferrer">YouTube Channel</a></li>
             <li>Email: <a href="mailto:timongogoyt@ferendovych.uk">timongogoyt@ferendovych.uk</a></li>
         </ul>
     </main>
