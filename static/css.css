@@ -1,129 +1,125 @@
-/* Font styling for common elements */
-h1, h3, p, div, h4, input {
-    font-family: Arial, Helvetica, sans-serif;
+/* Import clean, modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+/* Core Typography */
+body, h1, h3, h4, p, div, input, button {
+    font-family: 'Inter', sans-serif;
+    color: #f5f5f7;
+    background-color: #1b1c22;
+    margin: 0;
 }
 
-/* General button styles */
+/* General Buttons */
 button {
-    text-decoration: none !important;
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #5c6bc0, #3949ab);
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 button:hover {
-    text-decoration: none !important;
-    border-bottom: none;
-    background-color: #45a049;
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #7986cb, #3f51b5);
+    transform: translateY(-2px) scale(1.03);
 }
 
 button:focus {
-    text-decoration: none !important;
-    border-bottom: none;
     outline: none;
-    box-shadow: 0 0 10px rgba(72, 204, 96, 0.7);
+    box-shadow: 0 0 12px rgba(92, 107, 192, 0.6);
 }
 
-/* Secret button fixed on screen */
+/* Secret Floating Button */
 .secret-button {
-    text-decoration: none !important;
-    border-bottom: none;
     position: fixed;
-    bottom: 10px;
-    left: 10px;
-    width: 80px;
-    height: 50px;
-    color: white;
-    border: none;
+    bottom: 16px;
+    left: 16px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #ff4081, #f50057);
     border-radius: 50%;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 16px;
     text-align: center;
-    line-height: 40px;
-    cursor: pointer;
+    line-height: 60px;
+    color: white;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
-/* Centered block element */
-.center {
-    display: block;
-    margin: 0 auto;
-    text-align: center;
-}
-
-/* Input styling */
+/* Inputs */
 input {
-    border-radius: 8px;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background-color: #2b2c36;
+    border: 1px solid #444;
+    color: #eee;
+    transition: border 0.2s, box-shadow 0.2s;
 }
 
-/* Home button specific style */
-.homebutton {
-    font-size: 14px;
-}
-
-/* Anchor link styles */
-a {
-    text-decoration: none !important;
-    color: inherit;
-}
-
-a:hover,
-a:focus,
-a:active {
-    text-decoration: none !important;
-    color: inherit;
+input:focus {
     outline: none;
+    border-color: #7986cb;
+    box-shadow: 0 0 6px rgba(121, 134, 203, 0.5);
 }
 
-/* Big button */
+/* Link Styles */
+a {
+    color: #90caf9;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #bbdefb;
+}
+
+/* Button Size Variants */
 .big-button {
-    padding: 15px 30px;
-    font-size: 18px;
-    border-radius: 20px;
-    cursor: pointer;
+    padding: 18px 36px;
+    font-size: 20px;
+    border-radius: 24px;
 }
 
-/* Little-big-button (fixed trailing comma issue) */
 .little-big-button {
-    padding: 10px 20px;
-    font-size: 14px;
+    padding: 10px 24px;
+    font-size: 16px;
     border-radius: 20px;
-    cursor: pointer;
 }
 
-/* Not found text */
+/* Not Found Typography */
 .notfound {
-    font-size: 50px;
-    color: #a50000;
+    font-size: 48px;
+    color: #ef5350;
+    font-weight: bold;
 }
 
 .notfound1 {
-    font-size: 70px;
+    font-size: 64px;
+    color: #ff8a65;
+    font-weight: bold;
 }
 
-/* Sliding text animation */
+/* Sliding Text Animation */
 .sliding-text-container {
     width: 100%;
     overflow: hidden;
-    background: #fff;
-    color: #222;
+    background: #272935;
+    color: #f5f5f5;
     font-weight: bold;
-    font-size: 2.5rem;
+    font-size: 2rem;
     white-space: nowrap;
     box-sizing: border-box;
     padding: 10px 0;
     margin-bottom: 20px;
-    font-family: Arial, Helvetica, sans-serif;
 }
 
 .sliding-text {
     display: inline-block;
     padding-left: 100%;
-    animation: slide-left 15s linear infinite;
+    animation: slide-left 12s linear infinite;
 }
 
 @keyframes slide-left {
@@ -135,12 +131,24 @@ a:active {
     }
 }
 
+/* Center alignment utility */
+.center {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Responsive tweaks */
 @media (max-width: 600px) {
   button, 
   .secret-button,
   .homebutton,
   .little-big-button {
-    padding: 18px 30px !important;
-    font-size: 18px !important;
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+  }
+
+  .sliding-text-container {
+    font-size: 1.5rem;
   }
 }
