@@ -20,9 +20,13 @@ body {
 .content {
     flex: 1;
     max-width: 960px;
+    width: 100%;
+    box-sizing: border-box;
     margin: 0 auto;
     padding: 40px 20px;
+    overflow-x: hidden; /* Prevent sideways scrolling */
 }
+
 
 /* Typography */
 h1, h2, h3, h4 {
@@ -134,9 +138,38 @@ footer {
 
 @keyframes slide-left {
     0% {
-        transform: translateX(0);
+        transform: translateX(100%);
     }
     100% {
         transform: translateX(-100%);
+    }
+}
+
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .content {
+        padding: 20px 12px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        border-bottom-width: 1px;
+    }
+
+    button, a.big-button {
+        width: 100%;
+        max-width: 100%;
+        font-size: 16px;
+        padding: 14px;
+        box-sizing: border-box;
+    }
+
+    .sliding-text {
+        font-size: 0.95rem;
     }
 }
