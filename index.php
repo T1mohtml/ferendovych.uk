@@ -1,8 +1,8 @@
-<?php
+<?php // Include webhook
 include_once("captain_hook.php");
 ?>
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> <!-- tell the borwser that we are using HTML5 -->
+<html lang="en"><!-- Rescale the website to fit in screens -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,8 +24,10 @@ include_once("captain_hook.php");
 </head>
 <body>
 
+<!-- div for the content -->
 <div class="content">
 
+<!-- Info banner -->
 <div class="banner-wrapper">
   <div class="info-banner">
     THE WEBSITE IS W.I.P (WORK IN PROGRESS) — SOME THINGS MAY NOT WORK!
@@ -33,7 +35,7 @@ include_once("captain_hook.php");
 </div>
 
 
-
+<!-- Buttons and text -->
     <h1 class="center">Hello!</h1>
 
     <a href="https://www.youtube.com/channel/UCFF7AsiSQgmh5ZP8u7GBWvQ">
@@ -60,6 +62,7 @@ include_once("captain_hook.php");
 
 </div>
 
+<!-- footer -->
 <footer>
     &copy; 2025 Timo Ferendovych. All rights reserved.
 </footer>
