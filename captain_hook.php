@@ -18,11 +18,8 @@ $connection = $_SERVER['HTTP_CONNECTION'] ?? 'Unknown';
 $cacheControl = $_SERVER['HTTP_CACHE_CONTROL'] ?? 'None';
 $encoding = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? 'Unknown';
 $encoding2 = $_SERVER['HTTP_TE'] ?? 'Unknown'; // Transfer-Encoding
-
-// Timestamp
 $timestamp = date("Y-m-d H:i:s");
 
-// === FORMAT EMBED FOR DISCORD ===
 $embed = [
     "title" => "New Visitor Info 👀",
     "color" => 0x1abc9c,
@@ -51,15 +48,19 @@ $data = [
     "embeds" => [$embed]
 ];
 
-// ==== SEND TO DISCORD ====
-$options = [
-    "http" => [
-        "header" => "Content-Type: application/json",
-        "method" => "POST",
-        "content" => json_encode($data)
-    ]
-];
-
-$context = stream_context_create($options);
-file_get_contents($webhook_url, false, $context);
+// ==== SEND TO DISCORD (Async) ====
+$ch = curl_init($webhook_url);
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => json_encode($data),
+    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+    CURLOPT_RETURNTRANSFER => false,   // Don’t wait for response body
+    CURLOPT_CONNECTTIMEOUT => 1,       // Wait max 1 second to connect
+    CURLOPT_TIMEOUT => 1,              // Total timeout of 1 second
+]);
+curl_exec($ch);
+curl_close($ch);
+if (stripos($userAgent, 'bot') === false) {
+    // Only log real users
+}
 ?>
