@@ -26,11 +26,13 @@ include_once("captain_hook.php");
 
 <div class="content">
 
-    <div class="sliding-text-container">
-        <div class="sliding-text">
-            THE WEBSITE IS W.I.P (WORK IN PROGRESS) — SOME THINGS MAY NOT WORK!
-        </div>
-    </div>
+<div class="banner-wrapper">
+  <div class="info-banner">
+    THE WEBSITE IS W.I.P (WORK IN PROGRESS) — SOME THINGS MAY NOT WORK!
+  </div>
+</div>
+
+
 
     <h1 class="center">Hello!</h1>
 
@@ -54,8 +56,6 @@ include_once("captain_hook.php");
         <button class="secret-button center">Click me!</button>
     </a>
 
-    <a href="Flork.php">
-        <button class="center">Suggest Flork Ideas for Us to Draw!</button>
     </a>
 
     <a href="WeatherChecker.dmg" download class="big-button">
@@ -67,6 +67,6 @@ include_once("captain_hook.php");
 <footer>
     &copy; 2025 Timo Ferendovych. All rights reserved.
 </footer>
-
+<script src="script.js"></script>
 </body>
 </html>

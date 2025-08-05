@@ -44,7 +44,7 @@ include_once ("captain_hook.php");
         }
 
         .home-button {
-            background-color: #4CAF50;
+            background: linear-gradient(135deg, #5c6bc0, #3949ab);
             color: white;
             border: none;
             padding: 0.6em 1.5em;
@@ -54,12 +54,12 @@ include_once ("captain_hook.php");
             text-decoration: none;
             display: inline-block;
             font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
+            transition: background 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(57, 73, 171, 0.5);
         }
 
         .home-button:hover {
-            background-color: #45a049;
+            background: linear-gradient(135deg, #7986cb, #303f9f);
             transform: scale(1.05);
         }
 

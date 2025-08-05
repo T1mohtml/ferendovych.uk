@@ -5,6 +5,8 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+
 }
 
 body {
@@ -116,35 +118,6 @@ footer {
     border-top: 1px solid #333;
 }
 
-.sliding-text-container {
-    width: 100%;
-    overflow: hidden;
-    background-color: #3949ab;
-    padding: 0.5em 0;
-    margin-bottom: 2em;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(57, 73, 171, 0.5);
-}
-
-.sliding-text {
-    display: inline-block;
-    white-space: nowrap;
-    padding-left: 100%; /* Start off screen right */
-    animation: slide-left 15s linear infinite;
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: #e1e1e6;
-}
-
-@keyframes slide-left {
-    0% {
-        transform: translateX(100%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
 
 /* Mobile adjustments */
 @media (max-width: 600px) {
@@ -172,4 +145,21 @@ footer {
     .sliding-text {
         font-size: 0.95rem;
     }
+}
+
+.banner-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* horizontally centers the inner banner */
+  margin: 2em 0;
+}
+
+.info-banner {
+  padding: 1em 2em;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #5c6bc0, #3949ab);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
