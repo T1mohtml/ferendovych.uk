@@ -179,7 +179,7 @@ include_once ("captain_hook.php");
         <h2>About Me</h2>
         <p>
             I'm a 10-year-old developer from Denmark 🇩🇰. I love working with Python and Linux.<br>
-            I installed Arch Linux with GNOME myself, and I build apps in VS Code using Python, php and more.<br>
+            I installed Arch Linux with Plasma KDE myself, and I build apps in VS Code using Python, php and more.<br>
             I speak Ukrainian 🇺🇦, Danish 🇩🇰, and English 🇬🇧 fluently.
         </p>
 
