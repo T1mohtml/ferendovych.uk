@@ -60,7 +60,4 @@ curl_setopt_array($ch, [
 ]);
 curl_exec($ch);
 curl_close($ch);
-if (stripos($userAgent, 'bot') === false) {
-    // Only log real users
-}
 ?>
