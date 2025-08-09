@@ -9,6 +9,9 @@ html, body {
 
 }
 
+.stand {
+    text-align: center;
+}
 body {
     font-family: 'Inter', sans-serif;
     background-color: #1e1f26;
@@ -162,8 +165,4 @@ footer {
   font-weight: 600;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.stand {
-    text-align: center;
 }
