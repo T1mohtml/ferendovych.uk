@@ -25,7 +25,7 @@ include_once("captain_hook.php");
 <body>
 <!-- div for the content -->
 <div class="content">
-    <h2 class="center">#StandWithUkraine</h2>
+    <h2 class="center text-center">#StandWithUkraine</h2>
 <!-- Info banner -->
 <div class="banner-wrapper">
   <div class="info-banner">
