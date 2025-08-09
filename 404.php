@@ -48,5 +48,6 @@ http_response_code(404);
     <h1>404 Not Found</h1>
     <p>Awww shucks! This place does not exist <span class="emoji">D:</span></p>
     <a href="/" class="button">Take me back home </a>
+    <h5>#StandWithUkraine</h5>
 </body>
 </html>

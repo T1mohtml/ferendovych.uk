@@ -23,17 +23,15 @@ include_once("captain_hook.php");
     <link rel="stylesheet" href="static/css.css">
 </head>
 <body>
-
 <!-- div for the content -->
 <div class="content">
-
+    <h2 class="stand">#StandWithUkraine</h2>
 <!-- Info banner -->
 <div class="banner-wrapper">
   <div class="info-banner">
     THE WEBSITE IS W.I.P (WORK IN PROGRESS) — SOME THINGS MAY NOT WORK!
   </div>
 </div>
-
 
 <!-- Buttons and text -->
     <h1 class="center">Hello!</h1>
@@ -65,6 +63,7 @@ include_once("captain_hook.php");
 <!-- footer -->
 <footer>
     &copy; 2025 Timo Ferendovych. All rights reserved.
+    #StandWithUkraine
 </footer>
 <script src="script.js"></script>
 </body>

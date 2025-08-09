@@ -170,6 +170,7 @@ include_once ("captain_hook.php");
 </head>
 <body>
     <header>
+        
         <h1>Hi, I'm Timo 👋</h1>
         <p>10-year-old developer, Linux user & future software engineer</p>
         <a href="/" class="home-button" aria-label="Home">Home</a>
@@ -209,9 +210,10 @@ include_once ("captain_hook.php");
             <li>Email: <a href="mailto:timongogoyt@ferendovych.uk">timongogoyt@ferendovych.uk</a></li>
         </ul>
     </main>
-
+<p><a href="https://stand-with-ukraine.pp.ua"><img src="https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg" alt="Stand With Ukraine"></a></p>
     <footer>
         &copy; 2025-2025 Timo Ferendovych. All rights reserved.
+        #StandWithUkraine
     </footer>
 </body>
 </html>
