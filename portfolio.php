@@ -21,6 +21,18 @@ include_once ("captain_hook.php");
             display: flex;
             flex-direction: column;
         }
+        .ukraine-banner {
+            width: 100%;
+            background: linear-gradient(to right, #0057b7 0 50%, #ffd700 50% 100%);
+            color: #222;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.75em 0;
+            letter-spacing: 2px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
 
         header {
             background: linear-gradient(135deg, #5c6bc0, #3949ab);

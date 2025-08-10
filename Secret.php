@@ -17,6 +17,8 @@ include_once ("captain_hook.php");
     <meta name="theme-color" content="#ffffff">
 
     <link rel="stylesheet" href="static/Secretstyle.css">
+
+<div class="ukraine-banner">#StandWithUkraine</div>
 </head>
 <body>
 

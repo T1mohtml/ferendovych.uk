@@ -8,6 +8,8 @@ include_once ("captain_hook.php");
     <link rel="stylesheet" href="static/css.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<div class="ukraine-banner">#StandWithUkraine</div>
+
   <img class="center" src="IMG_1324.png" alt="Florks" width="500" height="500">
 </head>
 <body>

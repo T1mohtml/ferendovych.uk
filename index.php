@@ -21,11 +21,10 @@ include_once("captain_hook.php");
     <!-- Fonts & Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/css.css">
+<div class="ukraine-banner">#StandWithUkraine</div>
 </head>
 <body>
 <!-- div for the content -->
-<div class="content">
-    <h1>#StandWithUkraine</h1>
 <!-- Info banner -->
 <div class="banner-wrapper">
   <div class="info-banner">
@@ -52,13 +51,11 @@ include_once("captain_hook.php");
         <button class="secret-button center">Click me!</button>
     </a>
 
-    </a>
 
-    <a href="WeatherChecker.dmg" download class="big-button">
-        Download my app — type a city name and it shows live weather data!
-    </a>
+        <a href="WeatherChecker.dmg" download class="big-button">
+            Download my app — type a city name and it shows live weather data!
+        </a>
 
-</div>
 
 <!-- footer -->
 <footer>

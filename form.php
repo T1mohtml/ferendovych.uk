@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="static/css.css">
     <title>Submit Name & Message</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<div class="ukraine-banner">#StandWithUkraine</div>
 </head>
 <body>
 
