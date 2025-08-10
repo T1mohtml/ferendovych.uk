@@ -194,7 +194,7 @@ include_once ("captain_hook.php");
 
         <div class="project">
             <strong>🎮 TicTacToe Game</strong>
-            <p>A classic 2-player game built in Python.<br>Coming soon!</p>
+            <a href="https://github.com/T1mohtml/PyTicTacToe" target="_blank" rel="noopener noreferrer"><button>View on GitHub</a>
         </div>
 
         <div class="project">
