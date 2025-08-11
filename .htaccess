@@ -1,4 +1,4 @@
-# No HTTPS redirect here — Cloudflare handles it
+# No HTTPS redirect — Cloudflare handles it
 AddDefaultCharset UTF-8
 Options -Indexes
 
@@ -8,11 +8,15 @@ Options -Indexes
     AuthUserFile /var/www/html/.htpasswd
     Require valid-user
 </Files>
+
 RewriteEngine On
 
-# Internally rewrite /portfolio to /portfolio.php
-# RewriteRule ^portfolio$ portfolio.php [L]
+# Redirect /file.php to /file (clean URL)
+RewriteCond %{THE_REQUEST} \s/([a-zA-Z0-9_-]+)\.php [NC]
+RewriteRule ^([a-zA-Z0-9_-]+)\.php$ /$1 [R=301,L]
 
-# Optional: redirect /portfolio.php to /portfolio (clean URL)
-# RewriteCond %{THE_REQUEST} \s/portfolio\.php [NC]
-# RewriteRule ^portfolio\.php$ /portfolio [R=301,L]
+# Internally rewrite /file to /file.php if it exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^([a-zA-Z0-9_-]+)$ $1.php [L]
