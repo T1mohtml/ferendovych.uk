@@ -47,7 +47,7 @@ include_once("captain_hook.php");
         <button class="center">My Portfolio!</button>
     </a>
 
-    <a href="Secret.php">
+    <a href="secret.php">
         <button class="secret-button center">Click me!</button>
     </a>
 
