@@ -11,8 +11,8 @@ Options -Indexes
 RewriteEngine On
 
 # Internally rewrite /portfolio to /portfolio.php
-RewriteRule ^portfolio$ portfolio.php [L]
+# RewriteRule ^portfolio$ portfolio.php [L]
 
 # Optional: redirect /portfolio.php to /portfolio (clean URL)
-RewriteCond %{THE_REQUEST} \s/portfolio\.php [NC]
-RewriteRule ^portfolio\.php$ /portfolio [R=301,L]
+# RewriteCond %{THE_REQUEST} \s/portfolio\.php [NC]
+# RewriteRule ^portfolio\.php$ /portfolio [R=301,L]
