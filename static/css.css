@@ -18,6 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 .content {
@@ -46,10 +47,10 @@ h1 {
     width: 100%;
     background: linear-gradient(to right, #0057b7 0 50%, #ffd700 50% 100%);
     color: #222;
-    font-size: 1.5em;
+    font-size: 1.1em;
     font-weight: bold;
     text-align: center;
-    padding: 0.75em 0;
+    padding: 0.3em 0;
     letter-spacing: 2px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     /* border-bottom removed to prevent blue spillage */
@@ -135,6 +136,8 @@ footer {
 @media (max-width: 600px) {
     body {
         overflow-x: hidden;
+        overflow-y: auto !important;
+        overflow: auto !important;
     }
 
     .content {
