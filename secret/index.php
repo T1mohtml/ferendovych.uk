@@ -16,7 +16,7 @@ include_once ("captain_hook.php");
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="stylesheet" href="static/Secretstyle.css">
+    <link rel="stylesheet" href="../static/Secretstyle.css">
 
 <div class="ukraine-banner">#StandWithUkraine</div>
 </head>
