@@ -21,7 +21,9 @@ include_once("captain_hook.php");
     <!-- Fonts & Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/css.css">
-<div class="ukraine-banner">#StandWithUkraine</div>
+<div class="ukraine-banner" style="color: black;">
+    <a href="https://stand-with-ukraine.pp.ua" target="_blank" rel="noopener noreferrer" style="color: black;">#StandWithUkraine</a>
+</div>
 </head>
 <!-- BEGIN PLERDY CODE -->
 <script type="text/javascript" defer data-plerdy_code='1'>

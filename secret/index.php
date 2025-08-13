@@ -18,7 +18,9 @@ include_once ("captain_hook.php");
 
     <link rel="stylesheet" href="../static/Secretstyle.css">
 
-<div class="ukraine-banner">#StandWithUkraine</div>
+<link href="https://stand-with-ukraine.pp.ua" rel="noopener" target="_blank" class="ukraine-banner" style="display:block; text-align:center; text-decoration:none; color:inherit;">
+    #StandWithUkraine
+</link>
 </head>
 <body>
 
