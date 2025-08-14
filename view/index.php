@@ -27,13 +27,13 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                     border-radius: 18px;
                     box-shadow: 0 4px 24px rgba(60,60,100,0.18);
                     padding: 36px 32px;
+                    max-width: 420px;
                     width: 100%;
                     margin: 32px auto 0 auto;
                     border: 1.5px solid #3949ab;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    height: auto;
                 }
                 .styled-list {
                     list-style: none;
