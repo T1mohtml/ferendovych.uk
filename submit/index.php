@@ -1,4 +1,21 @@
 <?php
+// Enable error logging to browser console for debugging
+function js_console_log($msg) {
+    $msg = json_encode($msg);
+    echo "<script>console.error('PHP: ' + $msg);</script>";
+}
+
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    js_console_log("Error [$errno] $errstr in $errfile on line $errline");
+    return false; // Let normal error handler continue
+});
+set_exception_handler(function($e) {
+    js_console_log('Uncaught Exception: ' . $e->getMessage());
+});
+ini_set('display_errors', 0);
+ini_set('log_errors', 0);
+error_reporting(E_ALL);
+
 $db_path = __DIR__ . "/names.db"; // Store DB in same folder as script
 
 // Create DB & table if it doesn't exist
