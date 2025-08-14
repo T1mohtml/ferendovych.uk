@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../captain_hook.php');
+include_once ("../captain_hook.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
