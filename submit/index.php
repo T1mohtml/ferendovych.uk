@@ -1,3 +1,4 @@
+<?php echo "<div style='background:yellow;color:black;padding:8px;font-weight:bold;'>PHP IS RUNNING</div>"; ?>
 <?php
 // Enable error logging to browser console for debugging
 function js_console_log($msg) {
