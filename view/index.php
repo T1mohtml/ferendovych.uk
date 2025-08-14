@@ -3,7 +3,6 @@ $db_path = __DIR__ . '/../submit/names.db';
 
 if (!file_exists($db_path)) {
     die("No data yet.");
-}
 
 $db = new PDO("sqlite:$db_path");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
