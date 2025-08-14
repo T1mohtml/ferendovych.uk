@@ -117,7 +117,7 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
-            <form action="/submit/index.php" method="get" style="margin:0;">
+            <form action="/submit/" method="get" style="margin:0;">
                 <button type="submit" class="big-button">Submit a Name</button>
             </form>
             <button class="big-button" onclick="window.location.href='/'">Home</button>
