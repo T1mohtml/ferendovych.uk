@@ -40,7 +40,6 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                     padding: 0;
                     margin: 24px 0 18px 0;
                     width: 100%;
-                    max-width: 350px;
                 }
                 .styled-list li {
                     background: linear-gradient(135deg, #23243a 80%, #3949ab 100%);
