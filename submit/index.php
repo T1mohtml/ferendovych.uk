@@ -1,29 +1,4 @@
 <?php
-echo "<div style='background:yellow;color:black;padding:8px;font-weight:bold;'>PHP IS RUNNING</div>";
-$db_path = __DIR__ . "/names.db";
-if (file_exists($db_path)) {
-    echo "<div style='background:lightgreen;color:black;padding:8px;font-weight:bold;'>names.db exists</div>";
-    if (is_writable($db_path)) {
-        echo "<div style='background:lightgreen;color:black;padding:8px;'>names.db is writable</div>";
-    } else {
-        echo "<div style='background:orange;color:black;padding:8px;'>names.db is NOT writable</div>";
-    }
-} else {
-    if (is_writable(__DIR__)) {
-        echo "<div style='background:lightgreen;color:black;padding:8px;'>Directory is writable, DB can be created</div>";
-    } else {
-        echo "<div style='background:orange;color:black;padding:8px;'>Directory is NOT writable, DB cannot be created</div>";
-    }
-}
-try {
-    $db = new PDO("sqlite:$db_path");
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "<div style='background:lightgreen;color:black;padding:8px;'>PDO connection successful</div>";
-} catch (Exception $e) {
-    echo "<div style='background:red;color:white;padding:8px;'>PDO ERROR: ".htmlspecialchars($e->getMessage())."</div>";
-}
-?>
-<?php
 // Enable error logging to browser console for debugging
 function js_console_log($msg) {
     $msg = json_encode($msg);
