@@ -21,8 +21,6 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    min-height: 100vh;
-                    width: 100vw;
                 }
                                         .card {
                                             background: #23243a;
@@ -104,7 +102,7 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 }
             </style>
 </head>
-<body style="background: #1e1f26; min-height: 100vh;">
+<body style="background: #1e1f26;">
 <div class="centered-container">
     <div class="card">
         <h1>All Submitted Names</h1>
