@@ -102,7 +102,7 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 }
             </style>
 </head>
-<body style="background: #1e1f26;">
+<body style="background: #1e1f26; overflow: auto;">
 <div class="centered-container">
     <div class="card">
         <h1>All Submitted Names</h1>
