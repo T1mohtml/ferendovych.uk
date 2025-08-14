@@ -90,8 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </form>
     <?php if ($message) echo "<div class='message'>$message</div>"; ?>
     <button class="big-button" onclick="window.location.href='/'">Home</button>
-    <p style="margin-top: 18px;"><a href="view.php" class="big-button">View All Names</a></p>
+    <p style="margin-top: 18px;"><a href="/view/index.php" class="big-button">View All Names</a></p>
 </div>
-<link rel="stylesheet" href="static/css.css">
+<link rel="stylesheet" href="/static/css.css">
 </body>
 </html>
