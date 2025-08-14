@@ -11,7 +11,7 @@ include_once ("../captain_hook.php");
 <body>
 <div class="ukraine-banner">#StandWithUkraine</div>
 <h1 class="center">I came list (wow much fancy)</h1>
-<a href="/submit/index.php">
+<a href="../submit/index.php">
     <button class="center big-button">I Came list (write your name lol)</button>
 </a>
 <a href="/">
