@@ -1,5 +1,5 @@
 <?php
-$db_path = __DIR__ . "/names.db";
+$db_path = __DIR__ . "../submit/names.db";
 
 if (!file_exists($db_path)) {
     die("No data yet.");
