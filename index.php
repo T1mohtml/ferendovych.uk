@@ -61,7 +61,7 @@ include_once("captain_hook.php");
     </a>
 
     <a href="icame.php">
-        <button class="center">Florks</button>
+        <button class="center">iCame list</button>
 
     <a href="secret.php">
         <button class="secret-button center">Click me!</button>
