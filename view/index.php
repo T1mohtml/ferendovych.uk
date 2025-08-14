@@ -103,18 +103,6 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
                     letter-spacing: 1px;
                 }
             </style>
-            <script>
-            // On load, scroll to bottom, then lock scrolling
-            window.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
-                    setTimeout(function() {
-                        document.body.style.overflow = 'hidden';
-                        window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
-                    }, 400);
-                }, 200);
-            });
-            </script>
 </head>
 <body style="background: #1e1f26; min-height: 100vh;">
 <div class="centered-container">
