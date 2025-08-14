@@ -1,4 +1,4 @@
-
+<?php
 $db_path = __DIR__ . '/../submit/names.db';
 
 if (!file_exists($db_path)) {
@@ -52,6 +52,13 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
 <body>
 <div class="centered-container">
     <h1>All Submitted Names</h1>
+<?php
+}
+$db = new PDO("sqlite:$db_path");
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$stmt = $db->query("SELECT name FROM names ORDER BY id DESC");
+$names = $stmt->fetchAll(PDO::FETCH_COLUMN);
+?>
     <?php if (empty($names)): ?>
         <div class="empty-message">wow such empty</div>
     <?php else: ?>
