@@ -12,7 +12,7 @@ include_once ("captain_hook.php");
 </head>
 <body>
 <h1 class="center">I came list (wow much fancy)</h1>
-<a href="submit.php">
+<a href="../submit.php">
     <button class="center big-button">I Came list (write your name lol)</button>
 </a>
 <a href="/">
