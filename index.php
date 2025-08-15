@@ -60,7 +60,7 @@ include_once("captain_hook.php");
         <button class="center">My Portfolio!</button>
     </a>
 
-    <a href="icame.php">
+    <a href="submit.php">
         <button class="center">iCame list</button>
 
     <a href="secret.php">
