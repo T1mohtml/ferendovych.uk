@@ -4,4 +4,4 @@ clear_db.py
 .env.ini
 markdown (not in git)
 .htpasswd
-submit/names.db
+*.db
