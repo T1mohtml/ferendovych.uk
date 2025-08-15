@@ -2,21 +2,24 @@
 AddDefaultCharset UTF-8
 Options -Indexes
 
+# Password protect info.php
 <Files "info.php">
     AuthType Basic
-    AuthName "Restricted Area"
-    AuthUserFile /var/www/html/.htpasswd
+    AuthName "Restricted Access"
+    AuthUserFile /etc/apache2/.htpasswd
     Require valid-user
 </Files>
 
 RewriteEngine On
 
-# Redirect /file.php to /file (clean URL)
+# --- Redirect /file.php to /file, except info.php ---
 RewriteCond %{THE_REQUEST} \s/([a-zA-Z0-9_-]+)\.php [NC]
+RewriteCond %1 !=info
 RewriteRule ^([a-zA-Z0-9_-]+)\.php$ /$1 [R=301,L]
 
-# Internally rewrite /file to /file.php if it exists
+# --- Internally rewrite /file to /file.php if it exists, except info ---
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteCond $1 !=info
 RewriteRule ^([a-zA-Z0-9_-]+)$ $1.php [L]
