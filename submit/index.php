@@ -111,14 +111,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 <div class="centered-container"> <!-- div for the centered content -->
     <h1>Submit Your Name</h1> <!-- name submit text -->
-    <form method="post">
-        <input type="text" name="name" class="styled-input" placeholder="Enter your name" required>
-        <button type="submit">Submit</button>
+    <form method="post"> <!-- make the browser lnow we are using post method and not like... uhhh... OH yea got it get -->
+        <input type="text" name="name" class="styled-input" placeholder="Enter your name" required> <!-- boring input stuff -->
+        <button type="submit">Submit</button> <!-- wowwww such kool button -->
     </form>
-    <?php if ($message) echo "<div class='message'>$message</div>"; ?>
-    <button class="big-button" onclick="window.location.href='/'">Home</button>
-    <p style="margin-top: 18px;"><a href="/view/" class="big-button">View All Names</a></p>
-</div>
-<link rel="stylesheet" href="/static/css.css">
-</body>
-</html>
+    <?php if ($message) echo "<div class='message'>$message</div>"; ?> <!-- like seriously idk what this does -->
+    <button class="big-button" onclick="window.location.href='/'">Home</button> <!-- home button -->
+    <p style="margin-top: 18px;"><a href="/view/" class="big-button">View All Names</a></p> <!-- view names lol -->
+</div> <!-- end of some div (my memory is shit -->
+<link rel="stylesheet" href="/static/css.css"> <!-- link to stylesheet -->
+</body> <!-- body closing tag -->
+</html> <!-- html closing tag -->
