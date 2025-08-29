@@ -4,7 +4,7 @@ function js_console_log($msg) {
     $msg = json_encode($msg);
     echo "<script>console.error('PHP: ' + $msg);</script>";
 }
-
+// error handler
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
     js_console_log("Error [$errno] $errstr in $errfile on line $errline");
     return false; // Let normal error handler continue
@@ -46,7 +46,7 @@ $db->exec("CREATE TABLE IF NOT EXISTS names (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL
 )");
-
+// start the db insert procces
 $message = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST["name"] ?? "");
@@ -66,11 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
-<!DOCTYPE html>
+<!DOCTYPE html> <!-- tell brower that were using HTML5 -->
 <html>
 <head>
-    <title>Submit Your Name</title>
-    <style>
+    <title>Submit Your Name</title> <!-- title -->
+    <style> /* styles */
         .centered-container {
             display: flex;
             flex-direction: column;
@@ -109,8 +109,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </style>
 </head>
 <body>
-<div class="centered-container">
-    <h1>Submit Your Name</h1>
+<div class="centered-container"> <!-- div for the centered content -->
+    <h1>Submit Your Name</h1> <!-- name submit text -->
     <form method="post">
         <input type="text" name="name" class="styled-input" placeholder="Enter your name" required>
         <button type="submit">Submit</button>
