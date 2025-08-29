@@ -29,8 +29,12 @@ function contains_bad_words($text, $badWords) {
     if (empty($badWords)) {
         return false;
     }
-    $pattern = '/\b(?:' . implode('|', array_map(function($w){ return preg_quote($w, '/'); }, $badWords)) . ')\b/i';
-    return preg_match($pattern, $text);
+    foreach ($badWords as $word) {
+        if (preg_match('/\b' . preg_quote($word, '/') . '\b/i', $text)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 $db_path = __DIR__ . "/names.db"; // Store DB in same folder as script
