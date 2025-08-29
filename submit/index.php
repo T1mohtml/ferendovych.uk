@@ -29,7 +29,7 @@ function contains_bad_words($text, $badWords) {
     if (empty($badWords)) {
         return false;
     }
-    $pattern = '/\b(?:' . implode('|', array_map('preg_quote', $badWords)) . ')\b/i';
+    $pattern = '/\b(?:' . implode('|', array_map(function($w){ return preg_quote($w, '/'); }, $badWords)) . ')\b/i';
     return preg_match($pattern, $text);
 }
 
