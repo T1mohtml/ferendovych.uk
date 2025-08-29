@@ -17,6 +17,22 @@ ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
+// Profanity filter functions
+function load_bad_words($file_path = __DIR__ . '/../bad-words.txt') {
+    if (!file_exists($file_path)) {
+        return [];
+    }
+    return file($file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+}
+
+function contains_bad_words($text, $badWords) {
+    if (empty($badWords)) {
+        return false;
+    }
+    $pattern = '/\b(?:' . implode('|', array_map('preg_quote', $badWords)) . ')\b/i';
+    return preg_match($pattern, $text);
+}
+
 $db_path = __DIR__ . "/names.db"; // Store DB in same folder as script
 
 // Create DB & table if it doesn't exist
@@ -31,10 +47,16 @@ $message = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST["name"] ?? "");
     if ($name !== "") {
-        $stmt = $db->prepare("INSERT INTO names (name) VALUES (:name)");
-        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
-        $stmt->execute();
-        $message = "✅ Name added!";
+        // Load bad words and check for profanity
+        $badWords = load_bad_words();
+        if (contains_bad_words($name, $badWords)) {
+            $message = "⚠️ Inappropriate content is not allowed.";
+        } else {
+            $stmt = $db->prepare("INSERT INTO names (name) VALUES (:name)");
+            $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+            $stmt->execute();
+            $message = "✅ Name added!";
+        }
     } else {
         $message = "⚠️ Name cannot be empty.";
     }
