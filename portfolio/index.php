@@ -1,7 +1,7 @@
 <?php
-include_once ("captain_hook.php");
+include_once ("captain_hook.php"); // include logger bot (I SEE YOU)
 ?>
-<!DOCTYPE html>
+<!DOCTYPE html> <!-- tell browser that were usin- GOD DAMMIT I AINT DOIN THIS ON MY PHONE -->
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
