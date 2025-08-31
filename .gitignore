@@ -5,4 +5,4 @@ clear_db.py
 markdown (not in git)
 .htpasswd
 *.db
-dev/
+console.php
