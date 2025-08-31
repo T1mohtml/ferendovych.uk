@@ -120,5 +120,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <p style="margin-top: 18px;"><a href="/view/" class="big-button">View All Names</a></p>
 </div>
 <link rel="stylesheet" href="/static/css.css">
+<footer>
+  <small>We only collect names for the iCame list. Your info is safe with us.</small>
+</footer>
 </body>
 </html>
