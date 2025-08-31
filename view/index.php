@@ -1,17 +1,17 @@
 <?php
-$db_path = __DIR__ . '/../submit/names.db';
+$db_path = __DIR__ . '/../submit/names.db'; // path to db file
 
 if (!file_exists($db_path)) {
-    die("No data yet.");
+    die("No data yet."); // DIE CODE DIE
 }
 
 $db = new PDO("sqlite:$db_path");
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // idk what this does
 
-$stmt = $db->query("SELECT name FROM names ORDER BY id DESC");
+$stmt = $db->query("SELECT name FROM names ORDER BY id DESC"); // what does this do?
 $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
-<!DOCTYPE html>
+<!DOCTYPE html> <!-- tell browser that were using HTML5 -->
 <html>
 <head>
     <title>View Names</title>
