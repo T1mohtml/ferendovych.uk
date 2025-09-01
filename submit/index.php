@@ -1,13 +1,9 @@
 <?php
-// Enable error logging to browser console
+// Enable error logging to browser console for debugging
 function js_console_log($msg) {
     $msg = json_encode($msg);
     echo "<script>console.error('PHP: ' + $msg);</script>";
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
     js_console_log("Error [$errno] $errstr in $errfile on line $errline");
     return false;
@@ -15,24 +11,17 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 set_exception_handler(function($e) {
     js_console_log('Uncaught Exception: ' . $e->getMessage());
 });
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Profanity filter
+// Profanity filter functions
 function load_bad_words($file_path = __DIR__ . '/../bad-words.txt') {
-<<<<<<< HEAD
-    return file_exists($file_path) ? file($file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
-}
-function contains_bad_words($text, $badWords) {
-=======
     if (!file_exists($file_path)) return [];
     return file($file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 }
 function contains_bad_words($text, $badWords) {
     if (empty($badWords)) return false;
->>>>>>> origin/main
     foreach ($badWords as $word) {
         if (preg_match('/\b' . preg_quote($word, '/') . '\b/i', $text)) return true;
     }
@@ -86,19 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             justify-content: center;
             min-height: 80vh;
         }
-        .card {
-            background: #23243a;
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(60,60,100,0.18);
-            padding: 36px 32px;
-            max-width: 420px;
-            width: 100%;
-            margin: 32px auto 0 auto;
-            border: 1.5px solid #3949ab;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
         .styled-input {
             padding: 12px 16px;
             border-radius: 8px;
@@ -145,19 +121,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body style="background: #1e1f26; overflow:auto;">
 <div class="centered-container">
-<<<<<<< HEAD
-    <div class="card">
-        <h1>Submit Your Name</h1>
-        <form method="post">
-            <input type="text" name="name" class="styled-input" placeholder="Enter your name" required>
-            <button type="submit" class="big-button">Submit</button>
-        </form>
-        <?php if ($message) echo "<div class='message'>$message</div>"; ?>
-        <button class="big-button" onclick="window.location.href='/'">Home</button>
-        <p><a href="/view/" class="big-button">View All Names</a></p>
-    </div>
-</div>
-=======
     <h1>Submit Your Name</h1>
     <form method="post">
         <input type="text" name="name" class="styled-input" placeholder="Enter your name" required>
@@ -170,7 +133,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <footer>
   <small>We only collect names for the iCame list. Your info is safe with us.</small>
 </footer>
->>>>>>> origin/main
 </body>
 </html>
-

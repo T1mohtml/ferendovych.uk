@@ -8,3 +8,5 @@ markdown (not in git)
 console.php
 .htaccess
 .htpasswd
+submit/index.php~
+submit/dump.sql
