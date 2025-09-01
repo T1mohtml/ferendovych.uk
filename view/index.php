@@ -23,8 +23,6 @@ $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
         }
         .styled-list {
             list-style:none; padding:0; margin:24px 0 18px; width:100%;
-            max-height: 300px;       /* Max height for scroll */
-            overflow-y: auto;        /* Enable vertical scrolling */
         }
         .styled-list li {
             background: linear-gradient(135deg,#23243a 80%,#3949ab 100%);
