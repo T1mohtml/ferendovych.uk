@@ -4,7 +4,10 @@ function js_console_log($msg) {
     $msg = json_encode($msg);
     echo "<script>console.error('PHP: ' + $msg);</script>";
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
     js_console_log("Error [$errno] $errstr in $errfile on line $errline");
     return false;
@@ -19,9 +22,17 @@ error_reporting(E_ALL);
 
 // Profanity filter
 function load_bad_words($file_path = __DIR__ . '/../bad-words.txt') {
+<<<<<<< HEAD
     return file_exists($file_path) ? file($file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
 }
 function contains_bad_words($text, $badWords) {
+=======
+    if (!file_exists($file_path)) return [];
+    return file($file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+}
+function contains_bad_words($text, $badWords) {
+    if (empty($badWords)) return false;
+>>>>>>> origin/main
     foreach ($badWords as $word) {
         if (preg_match('/\b' . preg_quote($word, '/') . '\b/i', $text)) return true;
     }
@@ -134,6 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body style="background: #1e1f26; overflow:auto;">
 <div class="centered-container">
+<<<<<<< HEAD
     <div class="card">
         <h1>Submit Your Name</h1>
         <form method="post">
@@ -145,6 +157,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <p><a href="/view/" class="big-button">View All Names</a></p>
     </div>
 </div>
+=======
+    <h1>Submit Your Name</h1>
+    <form method="post">
+        <input type="text" name="name" class="styled-input" placeholder="Enter your name" required>
+        <button type="submit" class="big-button">Submit</button>
+    </form>
+    <?php if ($message) echo "<div class='message'>$message</div>"; ?>
+    <button class="big-button" onclick="window.location.href='/'">Home</button>
+    <p style="margin-top: 18px;"><a href="/view/" class="big-button">View All Names</a></p>
+</div>
+<footer>
+  <small>We only collect names for the iCame list. Your info is safe with us.</small>
+</footer>
+>>>>>>> origin/main
 </body>
 </html>
 

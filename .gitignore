@@ -5,3 +5,6 @@ clear_db.py
 markdown (not in git)
 .htpasswd
 *.db
+console.php
+.htaccess
+.htpasswd
