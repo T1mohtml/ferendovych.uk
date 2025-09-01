@@ -5,8 +5,8 @@ if (!file_exists($db_path)) {
     die("No data yet."); // DIE CODE DIE
 }
 
-$db = new PDO("sqlite:$db_path");
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // idk what this does
+$db = new PDO("mysql:host=localhost;dbname=names;charset=utf8mb4", "phpuser", "T1mongogo");
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $stmt = $db->query("SELECT name FROM names ORDER BY id DESC"); // what does this do?
 $names = $stmt->fetchAll(PDO::FETCH_COLUMN);
