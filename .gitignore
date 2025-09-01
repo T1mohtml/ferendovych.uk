@@ -6,3 +6,5 @@ markdown (not in git)
 .htpasswd
 *.db
 console.php
+.htaccess
+.htpasswd
