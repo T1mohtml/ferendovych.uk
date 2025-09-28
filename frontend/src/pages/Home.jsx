@@ -25,8 +25,10 @@ export default function Home() {
       transition={{ duration: 0.8 }}
       style={styles.container}
     >
-      <h1 style={styles.heading}>Hey! I'm Timo 👋</h1>
-      <p style={styles.text}>Welcome to my personal website.</p>
+      <div style={styles.textWrapper}>
+        <h1 style={styles.heading}>Hey! I'm Timo 👋</h1>
+        <p style={styles.text}>Welcome to my personal website.</p>
+      </div>
     </motion.div>
   );
 }
@@ -34,19 +36,24 @@ export default function Home() {
 const styles = {
   container: {
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100vh",
     width: "100vw",
     textAlign: "center",
-    padding: "clamp(1rem, 4vw, 3rem)", // responsive padding
+    padding: "clamp(1rem, 4vw, 3rem)",
+  },
+  textWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
   },
   heading: {
-    fontSize: "clamp(1.5rem, 6vw, 3rem)", // scales, but never too small or too big
+    fontSize: "clamp(1.5rem, 6vw, 3rem)",
     marginBottom: "1rem",
   },
   text: {
-    fontSize: "clamp(1rem, 3vw, 1.5rem)", // scales nicely on phone & desktop
+    fontSize: "clamp(1rem, 3vw, 1.5rem)",
   },
 };
