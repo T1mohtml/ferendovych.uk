@@ -15,7 +15,7 @@ export default function Home() {
 
   // Set dynamic page title
   useEffect(() => {
-    document.title = "Home - My Page";
+    document.title = "TimoSite - Home";
   }, []);
 
   return (
