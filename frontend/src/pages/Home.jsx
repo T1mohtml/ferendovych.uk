@@ -35,8 +35,13 @@ const styles = {
     minHeight: "100vh",
     width: "100vw",
     textAlign: "center",
-    padding: "2vw",
+    padding: "clamp(1rem, 4vw, 3rem)", // responsive padding
   },
-  heading: { fontSize: "4vw", marginBottom: "1rem" },
-  text: { fontSize: "2vw" },
+  heading: {
+    fontSize: "clamp(1.5rem, 6vw, 3rem)", // scales, but never too small or too big
+    marginBottom: "1rem",
+  },
+  text: {
+    fontSize: "clamp(1rem, 3vw, 1.5rem)", // scales nicely on phone & desktop
+  },
 };
