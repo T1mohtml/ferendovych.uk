@@ -15,7 +15,7 @@ export default function Home() {
 
   // Set dynamic page title
   useEffect(() => {
-    document.title = "TimoSite - Home";
+    document.title = "Home - My Page";
   }, []);
 
   return (
@@ -29,6 +29,9 @@ export default function Home() {
         <h1 style={styles.heading}>Hey! I'm Timo 👋</h1>
         <p style={styles.text}>Welcome to my personal website.</p>
       </div>
+      <p style={styles.footerText}>
+        If the text looks off, reload the page.
+      </p>
     </motion.div>
   );
 }
@@ -36,12 +39,14 @@ export default function Home() {
 const styles = {
   container: {
     display: "flex",
+    flexDirection: "column", // stack content vertically
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100vh",
     width: "100vw",
     textAlign: "center",
     padding: "clamp(1rem, 4vw, 3rem)",
+    position: "relative", // needed for footer absolute positioning
   },
   textWrapper: {
     display: "flex",
@@ -55,5 +60,11 @@ const styles = {
   },
   text: {
     fontSize: "clamp(1rem, 3vw, 1.5rem)",
+  },
+  footerText: {
+    position: "absolute",
+    bottom: "1rem",
+    fontSize: "clamp(0.75rem, 1.5vw, 1rem)",
+    color: "#555",
   },
 };
