@@ -13,6 +13,11 @@ export default function Home() {
     };
   }, []);
 
+  // Set dynamic page title
+  useEffect(() => {
+    document.title = "Home - My Page";
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
