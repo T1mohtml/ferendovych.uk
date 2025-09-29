@@ -1,3 +1,4 @@
+/* TODO: Add a down arrow so users will not think that theres no content lol people do that idk why tbh */
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 
