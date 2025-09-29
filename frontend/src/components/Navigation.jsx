@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
-export default function Navbar() {
+export default function Navigation() {
   const location = useLocation();
 
   const navItems = [
