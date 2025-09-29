@@ -2,9 +2,13 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function Climbing() {
-  // Set dynamic page title
+  // Set dynamic page title and force scroll to top
   useEffect(() => {
     document.title = "Climbing Adventures - Timo";
+    // Force scroll to absolute top of page
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, []);
 
   return (
@@ -199,13 +203,14 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     minHeight: "100vh",
     width: "100%",
     textAlign: "center",
     padding: "0 2rem 2rem 2rem",
-    paddingTop: "80px", // Space for fixed navbar
+    paddingTop: "120px", // Extra space for navbar + buffer
     margin: "0",
+    marginTop: "0",
     position: "relative",
     overflow: "hidden",
     background: "linear-gradient(135deg, rgba(100, 108, 255, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%)",
