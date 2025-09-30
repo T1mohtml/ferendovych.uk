@@ -5,9 +5,13 @@ import profileImage from "../assets/me.jpeg";
 export default function Home() {
   // Remove scroll disable - page is now scrollable
 
-  // Set dynamic page title
+  // Set dynamic page title and force scroll to top
   useEffect(() => {
     document.title = "Home - My Page";
+    // Force scroll to absolute top of page
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, []);
 
   return (
@@ -24,8 +28,8 @@ export default function Home() {
         <div style={styles.textWrapper}>
           <motion.h1 
             style={styles.heading}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, scale: 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ 
               duration: 0.8, 
               delay: 0.3,
@@ -33,7 +37,7 @@ export default function Home() {
             }}
             whileHover={{ 
               scale: 1.05,
-              transition: { duration: 0.2 }
+              transition: { duration: 0.15 }
             }}
           >
             Hey! I'm Timo 👋
@@ -101,7 +105,7 @@ export default function Home() {
               whileHover={{ 
                 scale: 1.05,
                 rotate: 2,
-                transition: { duration: 0.3 }
+                transition: { duration: 0.2 }
               }}
               whileTap={{ scale: 0.98 }}
             >
@@ -162,7 +166,7 @@ export default function Home() {
               whileHover={{ 
                 scale: 1.05,
                 color: "#646cff", // Use the same accent color as skill badges
-                transition: { duration: 0.3 }
+                transition: { duration: 0.2 }
               }}
             >
               About Me
@@ -182,12 +186,11 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.7 }}
               whileHover={{ 
                 x: 10,
-                transition: { duration: 0.2 }
+                transition: { duration: 0.15 }
               }}
             >
-              I'm a passionate developer who loves creating beautiful and functional web experiences. 
-              With a focus on modern technologies and user-centered design, I enjoy bringing ideas to life 
-              through code.
+              Hi! I'm Timo, a web developer based in Denmark.
+              I specialize in building modern, responsive websites even for my friends. I'm 11 years old and love coding.
             </motion.p>
             <motion.p 
               style={styles.aboutText}
@@ -197,11 +200,11 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.9 }}
               whileHover={{ 
                 x: -10,
-                transition: { duration: 0.2 }
+                transition: { duration: 0.15 }
               }}
             >
-              When I'm not coding, you can find me exploring new technologies, reading about web development 
-              trends, or working on personal projects that challenge me to grow as a developer.
+              When I'm not coding, I'm probably climbing, biking, or hanging out with friends or family.
+              but you can find me at <a href="https://github.com/T1mohtml" target="_blank">github</a> and via <a href="mailto:timongogoyt@ferendovych.uk">timongogoyt@ferendovych.uk</a>.
             </motion.p>
           </motion.div>
 
@@ -230,7 +233,7 @@ export default function Home() {
                   scale: 1.1,
                   y: -5,
                   boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-                  transition: { duration: 0.2 }
+                  transition: { duration: 0.15 }
                 }}
                 whileTap={{ scale: 0.95 }}
               >

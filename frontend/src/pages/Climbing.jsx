@@ -1,8 +1,22 @@
-/* TODO: Add a down arrow so users will not think that theres no content lol people do that idk why tbh */
-import React, { useEffect } from "react";
-import { motion } from "framer-motion";
+
+import React, { useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export default function Climbing() {
+  const containerRef = useRef(null);
+  
+  // Scroll-based animations
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  // Transform scroll progress to different values - these will reverse automatically
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const cardsY = useTransform(scrollYProgress, [0.2, 0.6], [50, -50]);
+  const cardsOpacity = useTransform(scrollYProgress, [0.1, 0.3, 0.7, 0.9], [0, 1, 1, 0]);
+
   // Set dynamic page title and force scroll to top
   useEffect(() => {
     document.title = "Climbing Adventures - Timo";
@@ -13,16 +27,20 @@ export default function Climbing() {
   }, []);
 
   return (
-    <>
+    <div ref={containerRef}>
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
+        style={{
+          ...styles.heroSection,
+          y: heroY,
+          opacity: heroOpacity,
+        }}
         transition={{ 
           duration: 1.0, 
           ease: [0.6, -0.05, 0.01, 0.99]
         }}
-        style={styles.heroSection}
       >
         <div style={styles.heroContent}>
           <motion.h1 
@@ -49,11 +67,43 @@ export default function Climbing() {
           >
             Exploring vertical worlds, one route at a time
           </motion.p>
+          
+          {/* Scroll Down Indicator */}
+          <motion.div
+            style={styles.scrollIndicator}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: 1.2,
+              ease: "easeOut"
+            }}
+            onClick={() => {
+              const adventuresSection = document.querySelector('[data-section="adventures"]');
+              if (adventuresSection) {
+                adventuresSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              style={styles.scrollArrow}
+            >
+              ⬇️
+            </motion.div>
+            <p style={styles.scrollText}>Scroll to see adventures</p>
+          </motion.div>
         </div>
       </motion.div>
 
       {/* Adventures Gallery Section */}
       <motion.section
+        data-section="adventures"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.2 }}
@@ -75,20 +125,28 @@ export default function Climbing() {
             {climbingAdventures.map((adventure, index) => (
               <motion.div
                 key={adventure.id}
-                style={styles.adventureCard}
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
+                style={{
+                  ...styles.adventureCard,
+                  y: cardsY,
+                  opacity: cardsOpacity,
+                }}
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: false, amount: 0.2 }}
                 transition={{ 
-                  duration: 0.6, 
-                  delay: index * 0.1 + 0.3,
+                  duration: 0.4,
+                  delay: index * 0.1,
                   ease: "easeOut"
                 }}
                 whileHover={{ 
-                  y: -10,
                   scale: 1.02,
                   boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
-                  transition: { duration: 0.5 }
+                  transition: { duration: 0.2 }
+                }}
+                animate={{
+                  scale: 1,
+                  boxShadow: "none",
+                  transition: { duration: 0 } // INSTANT return
                 }}
               >
                 <div style={styles.adventureContent}>
@@ -114,8 +172,8 @@ export default function Climbing() {
       <motion.section
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 1 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
         style={styles.statsSection}
       >
         <div style={styles.container}>
@@ -123,7 +181,7 @@ export default function Climbing() {
             style={styles.sectionTitle}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.5 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             Climbing Stats
@@ -136,7 +194,7 @@ export default function Climbing() {
                 style={styles.statCard}
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.3 }}
                 transition={{ 
                   duration: 0.5, 
                   delay: index * 0.1 + 0.3,
@@ -146,7 +204,12 @@ export default function Climbing() {
                 whileHover={{ 
                   scale: 1.05,
                   y: -5,
-                  transition: { duration: 0.1 }
+                  transition: { duration: 0.15 }
+                }}
+                animate={{
+                  scale: 1,
+                  y: 0,
+                  transition: { duration: 0 } // INSTANT return
                 }}
               >
                 <div style={styles.statIcon}>{stat.icon}</div>
@@ -157,7 +220,7 @@ export default function Climbing() {
           </div>
         </div>
       </motion.section>
-    </>
+    </div>
   );
 }
 
@@ -359,5 +422,23 @@ const styles = {
     fontSize: "1rem",
     color: "inherit",
     opacity: 0.7,
+  },
+  scrollIndicator: {
+    position: "relative",
+    marginTop: "2rem",
+    textAlign: "center",
+    cursor: "pointer",
+    zIndex: 3,
+  },
+  scrollArrow: {
+    fontSize: "2rem",
+    marginBottom: "0.5rem",
+    display: "block",
+  },
+  scrollText: {
+    fontSize: "0.9rem",
+    opacity: 0.7,
+    margin: "0",
+    color: "inherit",
   },
 };
