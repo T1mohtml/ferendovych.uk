@@ -239,7 +239,7 @@ const climbingAdventures = [
     id: 2,
     title: "Næstved Klatre Klub (NKL) lead",
     location: "Næstved, Sjælland, Denmark",
-    grade: "4a (lead scale)",
+    grade: "4a",
     type: "Lead Climbing",
     date: "Sep 2025",
     description: "Finally got permission to lead climb at NKL. Felt great to clip the quickdraws and manage the rope. hit my head twice when the rope came down! overall a great experience."
@@ -248,7 +248,7 @@ const climbingAdventures = [
     id: 3,
     title: "Næstved Klatre Klub (NKL) Lead",
     location: "Næstved, Sjælland, Denmark",
-    grade: "4b (lead scale)",
+    grade: "4b",
     type: "Lead Climbing",
     date: "Sep 2025",
     description: "Tried leading a slightly harder route this time. Fell a couple of times but managed to top it out and get to the top."
