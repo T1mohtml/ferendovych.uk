@@ -1,6 +1,164 @@
 
 import React, { useEffect, useRef } from "react"; // Import react stuff
+// Example: import an image from the src tree (bundled by the build)
+// assets live in src/assets; from src/pages the relative path is ../assets
+import FirstClimb from "../assets/FirstClimb.jpeg";
+import FirstLead from "../assets/FirstLead.jpeg";
+import Boulder from "../assets/Boulder.mp4";
+import LoopIcon from "../assets/loop.svg";
 import { motion, useScroll, useTransform } from "framer-motion"; // import framer motion for animations
+
+// Small helper component: autoplay muted video when at least 50% in view, pause otherwise
+function AutoPlayVideo({ src, poster, className, style }) {
+  const ref = React.useRef(null);
+  const [muted, setMuted] = React.useState(true);
+  const [loaded, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    el.muted = muted;
+    el.playsInline = true;
+    // do not preload full video to save bandwidth; we'll load on intersect
+    el.preload = 'metadata';
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // when near viewport (20%), lazy-load the source
+          if (!loaded && entry.isIntersecting && entry.intersectionRatio >= 0.2) {
+            el.src = src;
+            try { el.load(); } catch (e) {}
+            setLoaded(true);
+          }
+
+          // play when at least 50% visible, pause otherwise
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            try {
+              el.play().catch(() => {
+                // ensure muted then retry
+                el.muted = true;
+                el.play().catch(() => {});
+              });
+            } catch (e) {}
+          } else {
+            try { el.pause(); } catch (e) {}
+          }
+        });
+      },
+      { threshold: [0.2, 0.5] }
+    );
+
+    observer.observe(el);
+
+    // show a loop overlay briefly when video ends or reaches the end (robust)
+    let loopTimeout = null;
+    let lastShown = 0;
+    const showOverlay = () => {
+      const container = el.parentElement;
+      const overlay = container?.querySelector('[data-loop-overlay]');
+      if (overlay) {
+        overlay.style.opacity = '1';
+        clearTimeout(loopTimeout);
+        loopTimeout = setTimeout(() => { overlay.style.opacity = '0'; }, 900);
+      }
+    };
+
+    const onEnded = () => {
+      showOverlay();
+    };
+
+    const onTime = () => {
+      if (!el.duration || !isFinite(el.duration)) return;
+      // if within 120ms of the end and we haven't shown recently, flash overlay
+      if (el.currentTime >= el.duration - 0.12) {
+        const now = Date.now();
+        if (now - lastShown > 900) {
+          lastShown = now;
+          showOverlay();
+        }
+      }
+    };
+
+    el.addEventListener('ended', onEnded);
+    el.addEventListener('timeupdate', onTime);
+
+    return () => {
+      observer.disconnect();
+      el.removeEventListener('ended', onEnded);
+      el.removeEventListener('timeupdate', onTime);
+      clearTimeout(loopTimeout);
+      try { el.pause(); } catch (e) {}
+    };
+  }, [src, loaded, muted]);
+
+  // toggle mute state
+  const toggleMute = () => {
+    const el = ref.current;
+    if (!el) return;
+    const next = !muted;
+    setMuted(next);
+    try { el.muted = next; } catch (e) {}
+  };
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }} className={className}>
+      <video
+        ref={ref}
+        poster={poster}
+        muted={muted}
+        loop
+        playsInline
+        style={{ width: '100%', height: '100%', display: 'block', ...(style || {}) }}
+      />
+
+      {/* gradient overlay for better text/contrast */}
+      <div style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: '40%',
+        background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 100%)',
+        pointerEvents: 'none'
+      }} />
+
+      {/* loop overlay (hidden by default) */}
+      <div data-loop-overlay style={{
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 6,
+        opacity: 0,
+        transition: 'opacity 180ms ease'
+      }}>
+        <img src={LoopIcon} alt="loop" style={{ width: '48px', height: '48px' }} />
+      </div>
+
+      {/* mute/unmute button */}
+      <button
+        onClick={toggleMute}
+        aria-label={muted ? 'Unmute video' : 'Mute video'}
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: 5,
+          background: 'rgba(0,0,0,0.5)',
+          border: 'none',
+          color: 'white',
+          padding: '6px 8px',
+          borderRadius: '6px',
+          cursor: 'pointer'
+        }}
+      >
+        {muted ? '🔇' : '🔊'}
+      </button>
+    </div>
+  );
+}
 
 // Climbing adventures data
 
@@ -151,6 +309,25 @@ export default function Climbing() { // export stuff (idk what this does lol)
                   transition: { duration: 0 } // INSTANT return
                 }}
               >
+                {/* If a video is provided, render it; otherwise render the image */}
+                {adventure.video ? (
+                  <div style={styles.adventureImageWrapper}>
+                    <AutoPlayVideo
+                      src={adventure.video}
+                      poster={adventure.poster || adventure.image || '/vite.svg'}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                ) : (
+                  <div style={styles.adventureImageWrapper}>
+                    <img
+                      src={adventure.image || '/vite.svg'}
+                      alt={adventure.title}
+                      style={styles.adventureImage}
+                    />
+                  </div>
+                )}
+
                 <div style={styles.adventureContent}>
                   <div style={styles.adventureHeader}>
                     <h3 style={styles.adventureTitle}>{adventure.title}</h3>
@@ -211,7 +388,7 @@ export default function Climbing() { // export stuff (idk what this does lol)
                 animate={{
                   scale: 1,
                   y: 0,
-                  transition: { duration: 0 } // INSTANT return
+                  transition: { duration: 0 } // INSTANT return (coolcat style)
                 }}
               >
                 <div style={styles.statIcon}>{stat.icon}</div>
@@ -235,6 +412,11 @@ const climbingAdventures = [
     grade: "5A (boulder scale)",
     type: "Bouldering",
     date: "Sep 2025",
+    // example: place images in public/images/climbing/ and reference them like '/images/climbing/naestved-boulder.jpg'
+  image: FirstClimb,
+  // use imported Boulder mp4 as video src (bundled by Vite)
+  video: Boulder,
+  poster: FirstClimb,
     description: "Finally got to to the top before it started to be a leading route. It was also my first route before i found some of the easier ones."
   },
   {
@@ -244,16 +426,18 @@ const climbingAdventures = [
     grade: "4a",
     type: "Lead Climbing",
     date: "Sep 2025",
-    description: "Finally got permission to lead climb at NKL. Felt great to clip the quickdraws and manage the rope. hit my head twice when the rope came down! overall a great experience."
+    image: FirstLead,
+    description: "Finally got permission to lead climb at NKL. Felt great to clip the quickdraws and manage the rope. hit my head once when the rope came down! overall a great experience."
   },
   {
     id: 3,
-    title: "Næstved Klatre Klub (NKL) Lead",
+    title: "Næstved Klatre Klub (NKL) Top Rope",
     location: "Næstved, Sjælland, Denmark",
-    grade: "4b",
-    type: "Lead Climbing",
-    date: "Sep 2025",
-    description: "Tried leading a slightly harder route this time. Fell a couple of times but managed to top it out and get to the top."
+    grade: "4a (i think)",
+    type: "Top Rope climbing",
+    date: "Jun 2025",
+    image: FirstClimb,
+    description: "My first time climbing at NKL. First time got to about half the route before getting scared. Second time I managed to top it out and get to the top."
   }
 ];
 
@@ -443,4 +627,17 @@ const styles = {
     margin: "0",
     color: "inherit",
   },
+  adventureImageWrapper: {
+    width: '100%',
+    height: '220px',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0,0,0,0.03)'
+  },
+  adventureImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
+    transition: 'transform 220ms ease'
+  }
 };
