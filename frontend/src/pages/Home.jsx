@@ -55,6 +55,37 @@ export default function Home() {
             Welcome to my personal website.
           </motion.p>
           
+          {/* Scroll Down Indicator */}
+          <motion.div
+            style={styles.scrollIndicator}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: 1.0,
+              ease: "easeOut"
+            }}
+            onClick={() => {
+              const aboutSection = document.querySelector('[data-section="about"]');
+              if (aboutSection) {
+                aboutSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              style={styles.scrollArrow}
+            >
+              ⬇️
+            </motion.div>
+            <p style={styles.scrollText}>Scroll to learn more</p>
+          </motion.div>
+          
           {/* Floating animation elements */}
           <motion.div
             style={styles.floatingElement1}
@@ -85,6 +116,7 @@ export default function Home() {
       </motion.div>
 
       <motion.section
+        data-section="about"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, amount: 0.3 }}
@@ -406,5 +438,23 @@ const styles = {
     background: "linear-gradient(135deg, #667eea, #764ba2)",
     opacity: 0.3,
     zIndex: 1,
+  },
+  scrollIndicator: {
+    position: "relative",
+    marginTop: "2rem",
+    textAlign: "center",
+    cursor: "pointer",
+    zIndex: 3,
+  },
+  scrollArrow: {
+    fontSize: "2rem",
+    marginBottom: "0.5rem",
+    display: "block",
+  },
+  scrollText: {
+    fontSize: "0.9rem",
+    opacity: 0.7,
+    margin: "0",
+    color: "inherit",
   },
 };

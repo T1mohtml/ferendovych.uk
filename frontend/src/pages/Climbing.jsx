@@ -43,7 +43,7 @@ export default function Climbing() {
         }}
       >
         <div style={styles.heroContent}>
-          <motion.h1 
+                    <motion.h1 
             style={styles.heroTitle}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
