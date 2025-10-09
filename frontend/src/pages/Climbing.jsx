@@ -444,7 +444,7 @@ const climbingAdventures = [
 // Climbing statistics
 const climbingStats = [
   { icon: "🎯", value: "15+", label: "Routes Climbed" },
-  { icon: "⛰️", value: "1", label: "Locations Visited" },
+  { icon: "⛰️", value: "2", label: "Locations Visited" },
   { icon: "📈", value: "6b", label: "Hardest Grade" },
 ];
 
