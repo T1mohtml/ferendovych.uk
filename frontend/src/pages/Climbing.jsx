@@ -1,40 +1,42 @@
 
-import React, { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React, { useEffect, useRef } from "react"; // Import react stuff
+import { motion, useScroll, useTransform } from "framer-motion"; // import framer motion for animations
 
-export default function Climbing() {
+// Climbing adventures data
+
+export default function Climbing() { // export stuff (idk what this does lol)
   const containerRef = useRef(null);
   
   // Scroll-based animations
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ["start start", "end end"] // why 2 start starts and ends? no idea
   });
 
   // Transform scroll progress to different values - these will reverse automatically
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]); // hero? reminds me of Super man
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
-  const cardsY = useTransform(scrollYProgress, [0.2, 0.6], [50, -50]);
+  const cardsY = useTransform(scrollYProgress, [0.2, 0.6], [50, -50]); // cards? like credit cards?
   const cardsOpacity = useTransform(scrollYProgress, [0.1, 0.3, 0.7, 0.9], [0, 1, 1, 0]);
 
   // Set dynamic page title and force scroll to top
-  useEffect(() => {
-    document.title = "Climbing Adventures - Timo";
+  useEffect(() => { // ohh I see what this does
+    document.title = "Climbing Adventures - Timo"; // titleeee
     // Force scroll to absolute top of page
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, []);
 
-  return (
-    <div ref={containerRef}>
+  return ( // return? mkay *goes home to sleep*
+    <div ref={containerRef}> {/* dude why does this comment have to be in curly braces? */} {/* thats weaird */}
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         style={{
-          ...styles.heroSection,
-          y: heroY,
+          ...styles.heroSection, // spread operator, nice
+          y: heroY, // SPIDER MAN SPIDER MAN IM GONNA HIT YOU WITH A FRYING PAN
           opacity: heroOpacity,
         }}
         transition={{ 
@@ -42,19 +44,19 @@ export default function Climbing() {
           ease: [0.6, -0.05, 0.01, 0.99]
         }}
       >
-        <div style={styles.heroContent}>
-                    <motion.h1 
+        <div style={styles.heroContent}> {/* tbh im not sure what this does, smth with heroes ig */}
+                    <motion.h1 /* h1? like in html? *(mind blown)* */
             style={styles.heroTitle}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
               duration: 0.8, 
               delay: 0.2,
-              ease: "easeOut"
+              ease: "easeOut" /* Okay *Fades out of existence* */
             }}
           >
-            🧗‍♂️ Climbing Adventures
-          </motion.h1>
+            🧗‍♂️ Climbing Adventures {/* Ayy finally smth i understand something!!11!1! smh */}
+          </motion.h1> {/* h1 end */}
           <motion.p 
             style={styles.heroText}
             initial={{ opacity: 0, y: 20 }}
