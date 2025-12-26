@@ -10,3 +10,4 @@ console.php
 .htpasswd
 submit/index.php~
 submit/dump.sql
+.DS_Store
