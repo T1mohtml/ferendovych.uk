@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import profileImage from "../assets/me.jpeg";
+import NameForm from "../components/NameForm";
 
 export default function Home() {
   // Remove scroll disable - page is now scrollable
@@ -276,6 +277,10 @@ export default function Home() {
           </motion.div>
         </div>
       </motion.section>
+
+      <section style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+        <NameForm />
+      </section>
     </>
   );
 }

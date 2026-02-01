@@ -11,3 +11,4 @@ console.php
 submit/index.php~
 submit/dump.sql
 .DS_Store
+.dev.vars

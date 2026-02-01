@@ -1,2 +1,8 @@
 name = "ferendovych-uk"
-pages_build_output_dir = "./dist"
+# pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "guestbook-db"
+database_id = "a7448071-80de-423f-a2e9-97a7254442b7"
+
