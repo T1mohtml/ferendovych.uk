@@ -55,6 +55,27 @@ export default function Home() {
           >
             Welcome to my personal website.
           </motion.p>
+
+          <motion.button
+            style={styles.guestbookButton}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.8,
+              ease: "easeOut"
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              const guestbookSection = document.getElementById('guestbook');
+              if (guestbookSection) {
+                guestbookSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            Sign My GuestBook 📖
+          </motion.button>
           
           {/* Scroll Down Indicator */}
           <motion.div
@@ -278,7 +299,7 @@ export default function Home() {
         </div>
       </motion.section>
 
-      <section style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+      <section id="guestbook" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
         <NameForm />
       </section>
     </>
@@ -306,6 +327,20 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+  },
+  guestbookButton: {
+    padding: "0.8rem 1.6rem",
+    backgroundColor: "#646cff",
+    color: "white",
+    borderRadius: "12px",
+    fontSize: "1rem",
+    fontWeight: "600",
+    border: "none",
+    cursor: "pointer",
+    marginTop: "1.5rem",
+    marginBottom: "1rem",
+    boxShadow: "0 4px 15px rgba(100, 108, 255, 0.4)",
+    zIndex: 10,
   },
   heading: {
     fontSize: "clamp(1.5rem, 6vw, 3rem)",
