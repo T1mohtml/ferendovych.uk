@@ -46,7 +46,7 @@ function SkidBanner() {
       position: 'fixed', inset: 0, backgroundColor: '#000', color: '#fff',
       zIndex: 2147483647, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', fontFamily: '"Times New Roman", serif',
-      textAlign: 'center', padding: '40px', overflow: 'hidden'
+      textAlign: 'center', padding: '40px'
     }}>
       <button 
         onClick={clearCookie}
