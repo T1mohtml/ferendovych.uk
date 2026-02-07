@@ -1,6 +1,6 @@
 import { badWords } from '../bad-words.js';
 
-export const onRequestPost = async ({ request, env }) => {
+export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
     const { name, token } = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || "0.0.0.0";
@@ -61,6 +61,18 @@ export const onRequestPost = async ({ request, env }) => {
       .run();
 
     if (success) {
+      if (env.DISCORD_WEBHOOK_URL) {
+        waitUntil(
+          fetch(env.DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content: `📖 **New Guestbook Entry!**\n**Name:** ${name}\n**IP:** ||${ip}||`
+            })
+          })
+        );
+      }
+
       return new Response(JSON.stringify({ message: "Name saved successfully!" }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
