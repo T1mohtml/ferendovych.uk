@@ -6,6 +6,7 @@ import NameForm from "../components/NameForm";
 function SkidBanner() {
   const [showShame, setShowShame] = useState(false);
   const [caseId, setCaseId] = useState("");
+  const [isMercyVisible, setIsMercyVisible] = useState(false);
 
   useEffect(() => {
     const check = () => {
@@ -18,6 +19,11 @@ function SkidBanner() {
         
         // Anti-close warning
         window.onbeforeunload = () => "CRIMINAL INVESTIGATION IN PROGRESS: CLOSING THIS WINDOW WILL BE LOGGED AS OBSTRUCTION OF JUSTICE.";
+        
+        // Mercy Timer: Show redemption button after 15 seconds
+        setTimeout(() => {
+          setIsMercyVisible(true);
+        }, 15000);
       }
     };
     check();
@@ -30,7 +36,7 @@ function SkidBanner() {
     document.body.style.overflow = 'unset';
     window.onbeforeunload = null;
     setShowShame(false);
-    window.location.reload(); // Hard refresh to reset the layout
+    window.location.reload(); 
   };
 
   if (!showShame) return null;
@@ -42,7 +48,6 @@ function SkidBanner() {
       alignItems: 'center', justifyContent: 'center', fontFamily: '"Times New Roman", serif',
       textAlign: 'center', padding: '40px', overflow: 'hidden'
     }}>
-      {/* SECRET BYPASS BUTTON - Top Right, nearly invisible */}
       <button 
         onClick={clearCookie}
         style={{
@@ -89,9 +94,34 @@ function SkidBanner() {
           <p style={{ margin: '0', color: '#00ff00' }}>[+] UPLOADING_TO_QUANTICO... 88%</p>
         </div>
 
-        <p style={{ marginTop: '30px', fontWeight: 'bold', fontSize: '1.2rem' }}>
-          DO NOT CLOSE THIS WINDOW.
-        </p>
+        {/* Mercy Section: Appears after 15s */}
+        {isMercyVisible ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginTop: '30px', padding: '20px', border: '1px dashed #00ff00', borderRadius: '8px' }}
+          >
+            <p style={{ color: '#00ff00', marginBottom: '15px', fontWeight: 'bold' }}>
+              [SYSTEM MESSAGE]: This was a simulated security deterrent.
+            </p>
+            <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '20px' }}>
+              Scanning personal websites is bad practice. Please be more respectful of web boundaries.
+            </p>
+            <button 
+              onClick={clearCookie}
+              style={{
+                padding: '10px 25px', backgroundColor: '#00ff00', color: '#000',
+                border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer'
+              }}
+            >
+              I understand, let me back in
+            </button>
+          </motion.div>
+        ) : (
+          <p style={{ marginTop: '30px', fontWeight: 'bold', fontSize: '1.2rem' }}>
+            DO NOT CLOSE THIS WINDOW.
+          </p>
+        )}
         
         <p style={{ marginTop: '40px', fontSize: '0.8rem', opacity: 0.5, fontStyle: 'italic' }}>
           "Trying to look like a hacker? You're not in the movies, kid. You're in a browser cookie."
@@ -146,9 +176,9 @@ const styles = {
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center", // Keeps everything centered
+    alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: "#fff", // Change to match your theme
+    backgroundColor: "#fff", 
     minHeight: "100vh",
   },
   heroSection: {
