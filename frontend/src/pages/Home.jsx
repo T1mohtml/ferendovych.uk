@@ -8,44 +8,52 @@ function SkidBanner() {
   const [caseId, setCaseId] = useState("");
 
   useEffect(() => {
-    // 1. Check for the "shame cookie" set by Middleware
-    if (document.cookie.includes('visitor_type=skid')) {
-      setShowShame(true);
-      
-      // Lock the screen so he can't scroll away from the FBI
-      document.body.style.overflow = 'hidden';
-
-      // 2. Generate the fake Government Case ID
-      const year = new Date().getFullYear();
-      const randomHex = Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase();
-      setCaseId(`CF-${year}-${randomHex}`);
-
-      // 3. Optional: Scare him if he tries to close the tab
-      window.onbeforeunload = () => "CRIMINAL INVESTIGATION IN PROGRESS: CLOSING THIS WINDOW WILL BE LOGGED AS OBSTRUCTION OF JUSTICE.";
-    }
-    
-    return () => { document.body.style.overflow = 'unset'; };
+    const check = () => {
+      if (document.cookie.includes('visitor_type=skid')) {
+        setShowShame(true);
+        document.body.style.overflow = 'hidden';
+        const year = new Date().getFullYear();
+        const randomHex = Math.floor(Math.random() * 0xffffffff).toString(16).toUpperCase();
+        setCaseId(`CF-${year}-${randomHex}`);
+        
+        // Anti-close warning
+        window.onbeforeunload = () => "CRIMINAL INVESTIGATION IN PROGRESS: CLOSING THIS WINDOW WILL BE LOGGED AS OBSTRUCTION OF JUSTICE.";
+      }
+    };
+    check();
+    const interval = setInterval(check, 2000);
+    return () => clearInterval(interval);
   }, []);
+
+  const clearCookie = () => {
+    document.cookie = "visitor_type=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.body.style.overflow = 'unset';
+    window.onbeforeunload = null;
+    setShowShame(false);
+    window.location.reload(); // Hard refresh to reset the layout
+  };
 
   if (!showShame) return null;
 
   return (
     <div style={{
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: '#000',
-      color: '#fff',
-      zIndex: 999999,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: '"Times New Roman", Times, serif',
-      textAlign: 'center',
-      padding: '40px',
-      overflow: 'hidden'
+      position: 'fixed', inset: 0, backgroundColor: '#000', color: '#fff',
+      zIndex: 2147483647, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', fontFamily: '"Times New Roman", serif',
+      textAlign: 'center', padding: '40px', overflow: 'hidden'
     }}>
-      {/* FBI SEAL */}
+      {/* SECRET BYPASS BUTTON - Top Right, nearly invisible */}
+      <button 
+        onClick={clearCookie}
+        style={{
+          position: 'absolute', top: '10px', right: '10px',
+          background: 'transparent', border: 'none', color: '#0a0a0a', 
+          cursor: 'pointer', fontSize: '12px', zIndex: 10
+        }}
+      >
+        [BYPASS_INTERNAL_404]
+      </button>
+
       <img 
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Seal_of_the_Federal_Bureau_of_Investigation.svg/2048px-Seal_of_the_Federal_Bureau_of_Investigation.svg.png" 
         alt="FBI SEAL"
@@ -53,17 +61,10 @@ function SkidBanner() {
       />
 
       <h1 style={{ 
-        backgroundColor: '#002654', 
-        color: '#fff', 
-        width: '100vw', 
-        padding: '15px 0',
-        fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
-        borderTop: '5px solid #fff',
-        borderBottom: '5px solid #fff',
-        marginBottom: '30px',
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-        letterSpacing: '2px'
+        backgroundColor: '#002654', color: '#fff', width: '100vw', padding: '15px 0',
+        fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', borderTop: '5px solid #fff',
+        borderBottom: '5px solid #fff', marginBottom: '30px', fontWeight: 'bold',
+        textTransform: 'uppercase', letterSpacing: '2px'
       }}>
         Federal Bureau of Investigation
       </h1>
@@ -75,34 +76,28 @@ function SkidBanner() {
         
         <p style={{ textAlign: 'justify', fontSize: '1.1rem', marginBottom: '25px', color: '#ccc' }}>
           This device has been flagged for unauthorized use of automated fuzzing tools (<b>FFuF / Go-http-client</b>) against protected infrastructure. 
-          Under the Computer Fraud and Abuse Act (CFAA), unauthorized access to this system is a federal crime. 
-          Your physical location, IP address, and MAC address have been recorded.
+          Under the CFAA, unauthorized access is a federal crime. Your IP and activity have been recorded.
         </p>
 
         <div style={{ 
-          backgroundColor: '#111', 
-          border: '1px solid #444', 
-          padding: '20px', 
-          fontFamily: 'monospace',
-          textAlign: 'left',
-          position: 'relative'
+          backgroundColor: '#111', border: '1px solid #444', padding: '20px', 
+          fontFamily: 'monospace', textAlign: 'left'
         }}>
           <p style={{ margin: '0 0 8px 0', color: '#00ff00' }}>[+] INTERCEPT_STATUS: DATA_PACKET_CAPTURED</p>
-          <p style={{ margin: '0 0 8px 0', color: '#fff' }}>[+] CASE_IDENTIFIER: <span style={{ color: '#ffff00' }}>{caseId}</span></p>
-          <p style={{ margin: '0 0 8px 0', color: '#fff' }}>[+] CLEARANCE_LEVEL: <span style={{ color: '#ff0000' }}>DIRECTOR_LEVEL_ONLY</span></p>
-          <p style={{ margin: '0', color: '#00ff00' }}>[+] UPLOADING_EVIDENCE_TO_LOCAL_AUTHORITIES... 88%</p>
+          <p style={{ margin: '0 0 8px 0', color: '#fff' }}>[+] CASE_ID: <span style={{ color: '#ffff00' }}>{caseId}</span></p>
+          <p style={{ margin: '0 0 8px 0', color: '#fff' }}>[+] CLEARANCE: <span style={{ color: '#ff0000' }}>DIRECTOR_LEVEL_ONLY</span></p>
+          <p style={{ margin: '0', color: '#00ff00' }}>[+] UPLOADING_TO_QUANTICO... 88%</p>
         </div>
 
         <p style={{ marginTop: '30px', fontWeight: 'bold', fontSize: '1.2rem' }}>
-          DO NOT ATTEMPT TO POWER OFF OR DISCONNECT THIS DEVICE.
+          DO NOT CLOSE THIS WINDOW.
         </p>
         
         <p style={{ marginTop: '40px', fontSize: '0.8rem', opacity: 0.5, fontStyle: 'italic' }}>
-          "Trying to look like a hacker for her? You're not in the movies, kid. You're in a browser cookie."
+          "Trying to look like a hacker? You're not in the movies, kid. You're in a browser cookie."
         </p>
       </div>
 
-      {/* Flashing Light Effect */}
       <motion.div 
         animate={{ opacity: [0, 0.3, 0] }}
         transition={{ duration: 1.5, repeat: Infinity }}
@@ -118,31 +113,72 @@ function SkidBanner() {
 
 export default function Home() {
   useEffect(() => {
-    document.title = "Home - My Page";
+    document.title = "Home - Timo";
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <>
+    <div style={styles.pageContainer}>
       <SkidBanner />
-      {/* Rest of your Home component stays exactly the same */}
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: [0.6, -0.05, 0.01, 0.99] }}
         style={styles.heroSection}
       >
+        <img src={profileImage} alt="Profile" style={styles.profileImg} />
         <div style={styles.textWrapper}>
-          <motion.h1 style={styles.heading}>Hey! I'm Timo 👋</motion.h1>
-          <motion.p style={styles.text}>Welcome to my personal website.</motion.p>
-          {/* ... all your other hero/about content ... */}
+          <h1 style={styles.heading}>Hey! I'm Timo 👋</h1>
+          <p style={styles.text}>Welcome to my personal website.</p>
         </div>
       </motion.div>
-      {/* ... the rest of the file ... */}
-    </>
+
+      <section id="guestbook" style={styles.section}>
+        <NameForm />
+      </section>
+    </div>
   );
 }
 
 const styles = {
-    // Keep your styles object exactly as it was
-}
+  pageContainer: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center", // Keeps everything centered
+    justifyContent: "flex-start",
+    backgroundColor: "#fff", // Change to match your theme
+    minHeight: "100vh",
+  },
+  heroSection: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "100px 20px",
+    minHeight: "80vh",
+  },
+  profileImg: {
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    marginBottom: "20px",
+    objectFit: "cover",
+  },
+  heading: {
+    fontSize: "3rem",
+    margin: "10px 0",
+    color: "#333",
+  },
+  text: {
+    fontSize: "1.2rem",
+    color: "#666",
+  },
+  section: {
+    width: "100%",
+    maxWidth: "800px",
+    padding: "50px 20px",
+  }
+};
