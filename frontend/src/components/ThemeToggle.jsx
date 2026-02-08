@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 
-export default function ThemeToggle() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  const toggleMode = () => setDarkMode(!darkMode);
-
-  useEffect(() => {
-    document.body.style.backgroundColor = darkMode ? "#1a1a1a" : "#f0f0f0";
-    document.body.style.color = darkMode ? "#f0f0f0" : "#1a1a1a";
-  }, [darkMode]);
-
+export default function ThemeToggle({ darkMode, toggleMode }) {
   return (
     <div style={styles.toggleWrapper} onClick={toggleMode}>
       <motion.div

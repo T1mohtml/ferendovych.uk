@@ -7,7 +7,8 @@ export default function Navigation() {
 
   const navItems = [
     { path: "/", label: "Home", icon: "🏠" },
-    { path: "/climbing", label: "Climbing", icon: "🧗‍♂️" }
+    { path: "/climbing", label: "Climbing", icon: "🧗‍♂️" },
+    { path: "/coding", label: "Coding", icon: "💻" }
   ];
 
   return (
