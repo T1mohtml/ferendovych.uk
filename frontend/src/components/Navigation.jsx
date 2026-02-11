@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import "./Navigation.css";
 
 export default function Navigation() {
   const location = useLocation();
@@ -13,23 +14,23 @@ export default function Navigation() {
 
   return (
     <motion.nav
-      style={styles.navbar}
+      className="navbar"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <div style={styles.navContainer}>
+      <div className="nav-container">
         <motion.div
-          style={styles.logo}
+          className="nav-logo"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Link to="/" style={styles.logoLink}>
+          <Link to="/" className="nav-logo-link">
             Timo
           </Link>
         </motion.div>
 
-        <div style={styles.navLinks}>
+        <div className="nav-links">
           {navItems.map((item) => (
             <motion.div
               key={item.path}
@@ -38,12 +39,9 @@ export default function Navigation() {
             >
               <Link
                 to={item.path}
-                style={{
-                  ...styles.navLink,
-                  ...(location.pathname === item.path ? styles.activeLink : {})
-                }}
+                className={`nav-link ${location.pathname === item.path ? "active" : ""}`}
               >
-                <span style={styles.navIcon}>{item.icon}</span>
+                <span className="nav-icon">{item.icon}</span>
                 {item.label}
               </Link>
             </motion.div>
@@ -53,57 +51,3 @@ export default function Navigation() {
     </motion.nav>
   );
 }
-
-const styles = {
-  navbar: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    backdropFilter: "blur(10px)",
-    borderBottom: "1px solid rgba(100, 108, 255, 0.1)",
-    padding: "1rem 0",
-  },
-  navContainer: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "0 2rem",
-  },
-  logo: {
-    fontSize: "1.5rem",
-    fontWeight: "700",
-  },
-  logoLink: {
-    textDecoration: "none",
-    color: "#646cff",
-  },
-  navLinks: {
-    display: "flex",
-    gap: "2rem",
-    alignItems: "center",
-  },
-  navLink: {
-    textDecoration: "none",
-    color: "inherit",
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    padding: "0.5rem 1rem",
-    borderRadius: "25px",
-    transition: "all 0.3s ease",
-    fontSize: "0.95rem",
-    fontWeight: "500",
-  },
-  activeLink: {
-    backgroundColor: "#646cff",
-    color: "white",
-  },
-  navIcon: {
-    fontSize: "1rem",
-  },
-};
