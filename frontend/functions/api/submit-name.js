@@ -1,7 +1,39 @@
 import { badWords } from '../bad-words.js';
 
+const ensureNamesTableSchema = async (env) => {
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS names (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      ip_address TEXT,
+      country TEXT,
+      city TEXT,
+      user_agent TEXT,
+      asn TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`
+  ).run();
+
+  const { results } = await env.DB.prepare("PRAGMA table_info(names)").run();
+  const existingColumns = new Set((results || []).map((col) => col.name));
+
+  const missingColumns = [
+    ["ip_address", "TEXT"],
+    ["country", "TEXT"],
+    ["city", "TEXT"],
+    ["user_agent", "TEXT"],
+    ["asn", "TEXT"],
+  ].filter(([columnName]) => !existingColumns.has(columnName));
+
+  for (const [columnName, columnType] of missingColumns) {
+    await env.DB.prepare(`ALTER TABLE names ADD COLUMN ${columnName} ${columnType}`).run();
+  }
+};
+
 export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
+    await ensureNamesTableSchema(env);
+
     await env.DB.prepare(
       `CREATE TABLE IF NOT EXISTS banned_ips (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,6 +43,12 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`
     ).run();
+
+    const { results: bannedColumns } = await env.DB.prepare("PRAGMA table_info(banned_ips)").run();
+    const bannedColumnNames = new Set((bannedColumns || []).map((col) => col.name));
+    if (!bannedColumnNames.has("expires_at")) {
+      await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
+    }
 
     const { name, token } = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";

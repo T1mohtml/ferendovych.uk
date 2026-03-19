@@ -10,6 +10,12 @@ export const onRequestGet = async ({ request, env }) => {
       )`
     ).run();
 
+    const { results: bannedColumns } = await env.DB.prepare("PRAGMA table_info(banned_ips)").run();
+    const bannedColumnNames = new Set((bannedColumns || []).map((col) => col.name));
+    if (!bannedColumnNames.has("expires_at")) {
+      await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
+    }
+
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
 
     await env.DB.prepare(
