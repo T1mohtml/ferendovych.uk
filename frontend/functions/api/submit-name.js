@@ -4,6 +4,16 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
     const { name, token } = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || "0.0.0.0";
+    const country = request.headers.get("CF-IPCountry") || "Unknown";
+
+    // 0️⃣ Check Banned IPs
+    const { results: banned } = await env.DB.prepare(
+      "SELECT ip_address FROM banned_ips WHERE ip_address = ?"
+    ).bind(ip).run();
+
+    if (banned && banned.length > 0) {
+      return new Response(JSON.stringify({ error: "Access denied." }), { status: 403 });
+    }
 
     // 1️⃣ Validate Input
     if (!name || !name.trim()) {
@@ -55,9 +65,9 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
 
     // 5️⃣ Save to Database
     const { success } = await env.DB.prepare(
-      "INSERT INTO names (name, ip_address) VALUES (?, ?)"
+      "INSERT INTO names (name, ip_address, country) VALUES (?, ?, ?)"
     )
-      .bind(name, ip)
+      .bind(name, ip, country)
       .run();
 
     if (success) {

@@ -15,13 +15,17 @@ export default function Admin() {
     if (storedKey) {
       setPassword(storedKey);
       setIsAuthenticated(true);
-      fetchNames();
+      fetchNames(storedKey);
     }
   }, []);
 
-  const fetchNames = async () => {
+  const fetchNames = async (adminKey = password) => {
     try {
-      const response = await fetch('/api/get-names');
+      const response = await fetch('/api/get-names', {
+        headers: {
+          'Admin-Key': adminKey
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setNamesList(data);
@@ -46,7 +50,7 @@ export default function Admin() {
       if (response.ok) {
         sessionStorage.setItem('adminKey', password);
         setIsAuthenticated(true);
-        fetchNames(); 
+        fetchNames(password); 
       } else {
         setLoginError('Wrong password');
         setPassword('');
@@ -63,6 +67,32 @@ export default function Admin() {
     setPassword('');
     setIsAuthenticated(false);
     setLoginError('');
+  };
+
+  const handleBan = async (ip) => {
+    if (!ip) return;
+    if (!confirm(`Are you sure you want to ban the IP address ${ip}?`)) return;
+
+    try {
+      const response = await fetch('/api/ban-ip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Admin-Key': password
+        },
+        body: JSON.stringify({ ip, reason: 'Banned from Admin panel' })
+      });
+
+      if (response.ok) {
+        setStatus(`IP ${ip} banned successfully`);
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        const data = await response.json();
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setStatus('Network error banning IP');
+    }
   };
 
   const handleDelete = async (id) => {
@@ -151,13 +181,31 @@ export default function Admin() {
                     <span style={styles.listDate}>
                       {new Date(entry.created_at).toLocaleString()} (ID: {entry.id})
                     </span>
+                    {entry.ip_address && (
+                      <>
+                        <br/>
+                        <span style={styles.listDate}>
+                          IP: {entry.ip_address} {entry.country ? `(${entry.country})` : ''}
+                        </span>
+                      </>
+                    )}
                 </div>
-                <button 
-                    onClick={() => handleDelete(entry.id)}
-                    style={styles.deleteBtn}
-                >
-                    Delete
-                </button>
+                <div style={styles.actionGroup}>
+                  {entry.ip_address && (
+                      <button 
+                          onClick={() => handleBan(entry.ip_address)}
+                          style={styles.banBtn}
+                      >
+                          Ban IP
+                      </button>
+                  )}
+                  <button 
+                      onClick={() => handleDelete(entry.id)}
+                      style={styles.deleteBtn}
+                  >
+                      Delete
+                  </button>
+                </div>
               </motion.li>
             ))}
           </AnimatePresence>
@@ -232,6 +280,19 @@ const styles = {
       padding: '8px 12px',
       borderRadius: '6px',
       background: '#ff4b4b',
+      color: 'white',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+  },
+  actionGroup: {
+      display: 'flex',
+      gap: '0.5rem',
+  },
+  banBtn: {
+      padding: '8px 12px',
+      borderRadius: '6px',
+      background: '#e69a00',
       color: 'white',
       border: 'none',
       cursor: 'pointer',
