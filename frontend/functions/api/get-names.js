@@ -4,7 +4,7 @@ export const onRequestGet = async ({ request, env }) => {
     const isAdmin = adminKey && adminKey === env.ADMIN_PASSWORD;
 
     const query = isAdmin 
-      ? "SELECT id, name, ip_address, country, created_at FROM names ORDER BY created_at DESC"
+      ? "SELECT id, name, ip_address, country, city, user_agent, asn, created_at FROM names ORDER BY created_at DESC"
       : "SELECT id, name, created_at FROM names ORDER BY created_at DESC";
 
     const { results } = await env.DB.prepare(query).run();

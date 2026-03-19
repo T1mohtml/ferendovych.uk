@@ -182,12 +182,12 @@ export default function Admin() {
                       {new Date(entry.created_at).toLocaleString()} (ID: {entry.id})
                     </span>
                     {entry.ip_address && (
-                      <>
-                        <br/>
-                        <span style={styles.listDate}>
-                          IP: {entry.ip_address} {entry.country ? `(${entry.country})` : ''}
-                        </span>
-                      </>
+                      <div style={styles.detailsContainer}>
+                        <span style={styles.detailItem}><strong>IP:</strong> {entry.ip_address}</span>
+                        <span style={styles.detailItem}><strong>Location:</strong> {entry.city ? `${entry.city}, ` : ''}{entry.country}</span>
+                        <span style={styles.detailItem}><strong>ASN:</strong> {entry.asn}</span>
+                        <span style={styles.detailItem}><strong>Device:</strong> {entry.user_agent}</span>
+                      </div>
                     )}
                 </div>
                 <div style={styles.actionGroup}>
@@ -317,10 +317,27 @@ const styles = {
   listName: {
       fontWeight: 'bold',
       color: 'white',
+      fontSize: '1.2rem',
   },
   listDate: {
       fontSize: '0.8rem',
       color: '#aaa',
+      display: 'inline-block',
+      marginBottom: '0.5rem',
+  },
+  detailsContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.2rem',
+      marginTop: '0.5rem',
+      padding: '0.5rem',
+      background: 'rgba(0,0,0,0.3)',
+      borderRadius: '6px',
+      fontSize: '0.85rem',
+      color: '#ddd',
+  },
+  detailItem: {
+      wordBreak: 'break-all',
   },
   status: {
       color: '#ff4b4b',

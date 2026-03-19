@@ -3,8 +3,11 @@ import { badWords } from '../bad-words.js';
 export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
     const { name, token } = await request.json();
-    const ip = request.headers.get("CF-Connecting-IP") || "0.0.0.0";
-    const country = request.headers.get("CF-IPCountry") || "Unknown";
+    const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
+    const country = request.headers.get("CF-IPCountry") || request.cf?.country || "Local";
+    const city = request.cf?.city || "Unknown City";
+    const asn = request.cf?.asn || "Unknown ASN";
+    const userAgent = request.headers.get("User-Agent") || "Unknown Device";
 
     // 0️⃣ Check Banned IPs
     const { results: banned } = await env.DB.prepare(
@@ -65,9 +68,9 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
 
     // 5️⃣ Save to Database
     const { success } = await env.DB.prepare(
-      "INSERT INTO names (name, ip_address, country) VALUES (?, ?, ?)"
+      "INSERT INTO names (name, ip_address, country, city, user_agent, asn) VALUES (?, ?, ?, ?, ?, ?)"
     )
-      .bind(name, ip, country)
+      .bind(name, ip, country, city, userAgent, asn)
       .run();
 
     if (success) {

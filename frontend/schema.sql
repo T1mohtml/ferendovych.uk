@@ -4,6 +4,9 @@ CREATE TABLE IF NOT EXISTS names (
   name TEXT NOT NULL,
   ip_address TEXT,
   country TEXT,
+  city TEXT,
+  user_agent TEXT,
+  asn TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
