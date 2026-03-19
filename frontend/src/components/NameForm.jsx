@@ -62,7 +62,14 @@ export default function NameForm() {
         // Clear success message after 3 seconds
         setTimeout(() => setStatus(''), 3000);
       } else {
-        setStatus(`Error: ${data.error}`);
+        if (response.status === 403 && data?.reason) {
+          const expiresLabel = data.expires_at
+            ? new Date(data.expires_at.replace(' ', 'T') + 'Z').toLocaleString()
+            : 'Permanent';
+          setStatus(`Banned: ${data.reason}. Expires: ${expiresLabel}`);
+        } else {
+          setStatus(`Error: ${data.error}`);
+        }
       }
     } catch (error) {
       setStatus('Failed to connect to the server.');

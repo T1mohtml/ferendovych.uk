@@ -9,13 +9,26 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
     const asn = request.cf?.asn || "Unknown ASN";
     const userAgent = request.headers.get("User-Agent") || "Unknown Device";
 
+    await env.DB.prepare(
+      "DELETE FROM banned_ips WHERE expires_at IS NOT NULL AND datetime(expires_at) <= datetime('now')"
+    ).run();
+
     // 0️⃣ Check Banned IPs
     const { results: banned } = await env.DB.prepare(
-      "SELECT ip_address FROM banned_ips WHERE ip_address = ?"
+      `SELECT ip_address, reason, expires_at
+       FROM banned_ips
+       WHERE ip_address = ?
+       AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
+       LIMIT 1`
     ).bind(ip).run();
 
     if (banned && banned.length > 0) {
-      return new Response(JSON.stringify({ error: "Access denied." }), { status: 403 });
+      const activeBan = banned[0];
+      return new Response(JSON.stringify({
+        error: "You are banned from this website.",
+        reason: activeBan.reason || "No reason provided.",
+        expires_at: activeBan.expires_at,
+      }), { status: 403, headers: { "Content-Type": "application/json" } });
     }
 
     // 1️⃣ Validate Input
