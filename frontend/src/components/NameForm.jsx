@@ -8,13 +8,29 @@ export default function NameForm() {
   const [namesList, setNamesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [turnstileToken, setTurnstileToken] = useState(null);
+  const [isGuestbookLocked, setIsGuestbookLocked] = useState(false);
+  const [guestbookLockMessage, setGuestbookLockMessage] = useState('Guestbook is temporarily locked by admin.');
 
   // Replace with your actual Cloudflare Site Key
   const SITE_KEY = '0x4AAAAAACWX4Q_pTGMwm1dQ'; 
 
   useEffect(() => {
     fetchNames();
+    fetchSiteStatus();
   }, []);
+
+  const fetchSiteStatus = async () => {
+    try {
+      const response = await fetch('/api/site-status');
+      if (!response.ok) return;
+
+      const data = await response.json();
+      setIsGuestbookLocked(Boolean(data?.guestbookLocked));
+      setGuestbookLockMessage(data?.guestbookLockMessage || 'Guestbook is temporarily locked by admin.');
+    } catch (error) {
+      console.error('Failed to fetch site status:', error);
+    }
+  };
 
   const fetchNames = async () => {
     try {
@@ -33,6 +49,11 @@ export default function NameForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
+
+    if (isGuestbookLocked) {
+      setStatus(guestbookLockMessage);
+      return;
+    }
     
     // Only require token if Site Key is set to a real value (not the example one)
     // But for now, we'll send whatever we have
@@ -67,6 +88,8 @@ export default function NameForm() {
             ? new Date(data.expires_at.replace(' ', 'T') + 'Z').toLocaleString()
             : 'Permanent';
           setStatus(`Banned: ${data.reason}. Expires: ${expiresLabel}`);
+        } else if (response.status === 403 && data?.code === 'GUESTBOOK_LOCKED') {
+          setStatus(data.error || 'Guestbook is temporarily locked by admin.');
         } else {
           setStatus(`Error: ${data.error}`);
         }
@@ -87,6 +110,12 @@ export default function NameForm() {
       >
         <h2 style={styles.heading}>Sign the Guestbook ✍️</h2>
         <p style={styles.subtitle}>Leave your mark on my digital wall.</p>
+
+        {isGuestbookLocked && (
+          <p style={{ ...styles.status, color: '#ffb366', marginBottom: '1rem' }}>
+            {guestbookLockMessage}
+          </p>
+        )}
         
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
@@ -98,10 +127,12 @@ export default function NameForm() {
               required
               maxLength={50}
               style={styles.input}
+              disabled={isGuestbookLocked}
             />
             <motion.button 
               type="submit" 
               style={styles.button}
+              disabled={isGuestbookLocked}
               whileHover={{ scale: 1.02, backgroundColor: '#535bf2' }}
               whileTap={{ scale: 0.98 }}
             >
@@ -110,7 +141,7 @@ export default function NameForm() {
           </div>
           
           <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
-            <Turnstile siteKey={SITE_KEY} onSuccess={setTurnstileToken} />
+            {!isGuestbookLocked && <Turnstile siteKey={SITE_KEY} onSuccess={setTurnstileToken} />}
           </div>
 
         </form>

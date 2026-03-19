@@ -30,9 +30,20 @@ const ensureNamesTableSchema = async (env) => {
   }
 };
 
+const ensureSettingsTableSchema = async (env) => {
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS site_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`
+  ).run();
+};
+
 export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
     await ensureNamesTableSchema(env);
+    await ensureSettingsTableSchema(env);
 
     await env.DB.prepare(
       `CREATE TABLE IF NOT EXISTS banned_ips (
@@ -77,6 +88,23 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
         reason: activeBan.reason || "No reason provided.",
         expires_at: activeBan.expires_at,
       }), { status: 403, headers: { "Content-Type": "application/json" } });
+    }
+
+    const { results: settings } = await env.DB.prepare(
+      "SELECT key, value FROM site_settings WHERE key IN ('guestbook_locked', 'guestbook_lock_message')"
+    ).run();
+
+    const settingsMap = new Map((settings || []).map((row) => [row.key, row.value]));
+    const guestbookLocked = settingsMap.get('guestbook_locked') === '1';
+
+    if (guestbookLocked) {
+      return new Response(JSON.stringify({
+        error: settingsMap.get('guestbook_lock_message') || 'Guestbook is temporarily locked by admin.',
+        code: 'GUESTBOOK_LOCKED',
+      }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // 1️⃣ Validate Input

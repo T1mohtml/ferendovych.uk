@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Admin() {
@@ -12,16 +12,30 @@ export default function Admin() {
   const [banReason, setBanReason] = useState('Spam / bad language');
   const [banDurationValue, setBanDurationValue] = useState('7');
   const [banDurationUnit, setBanDurationUnit] = useState('days');
+  const [manualIp, setManualIp] = useState('');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [nameSearch, setNameSearch] = useState('');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [deleteIpInput, setDeleteIpInput] = useState('');
+  const [guestbookLocked, setGuestbookLocked] = useState(false);
+  const [guestbookLockMessage, setGuestbookLockMessage] = useState('Guestbook is temporarily locked by admin.');
 
   useEffect(() => {
     const storedKey = sessionStorage.getItem('adminKey');
     if (storedKey) {
       setPassword(storedKey);
       setIsAuthenticated(true);
-      fetchNames(storedKey);
-      fetchBannedIps(storedKey);
+      refreshAll(storedKey);
     }
   }, []);
+
+  const refreshAll = async (adminKey = password) => {
+    await Promise.all([
+      fetchNames(adminKey),
+      fetchBannedIps(adminKey),
+      fetchAdminSettings(adminKey),
+    ]);
+  };
 
   const fetchNames = async (adminKey = password) => {
     try {
@@ -55,6 +69,24 @@ export default function Admin() {
     }
   };
 
+  const fetchAdminSettings = async (adminKey = password) => {
+    try {
+      const response = await fetch('/api/admin-settings', {
+        headers: {
+          'Admin-Key': adminKey
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGuestbookLocked(Boolean(data.guestbook_locked));
+        setGuestbookLockMessage(data.guestbook_lock_message || 'Guestbook is temporarily locked by admin.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch admin settings:', error);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
@@ -70,8 +102,7 @@ export default function Admin() {
       if (response.ok) {
         sessionStorage.setItem('adminKey', password);
         setIsAuthenticated(true);
-        fetchNames(password);
-        fetchBannedIps(password);
+        refreshAll(password);
       } else {
         setLoginError('Wrong password');
         setPassword('');
@@ -162,6 +193,16 @@ export default function Admin() {
     }
   };
 
+  const handleManualBanOrExtend = () => {
+    const ip = manualIp.trim();
+    if (!ip) {
+      setStatus('Type an IP address first.');
+      return;
+    }
+
+    handleBan(ip);
+  };
+
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this specific signature?')) return;
 
@@ -188,6 +229,128 @@ export default function Admin() {
       setStatus('Network error');
     }
   };
+
+  const handleDeleteAllNames = async () => {
+    if (!confirm('Delete ALL guestbook entries? This cannot be undone.')) return;
+
+    try {
+      const response = await fetch('/api/delete-all-names', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Admin-Key': password,
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setNamesList([]);
+        setStatus(data.message || 'All entries deleted.');
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setStatus('Network error deleting all entries');
+    }
+  };
+
+  const handleDeleteNamesByIp = async () => {
+    const ip = deleteIpInput.trim();
+    if (!ip) {
+      setStatus('Type an IP address to delete names by IP.');
+      return;
+    }
+
+    if (!confirm(`Delete all names from IP ${ip}?`)) return;
+
+    try {
+      const response = await fetch('/api/delete-names-by-ip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Admin-Key': password,
+        },
+        body: JSON.stringify({ ip }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setStatus(`${data.deleted || 0} entries deleted for ${ip}`);
+        setDeleteIpInput('');
+        fetchNames(password);
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setStatus('Network error deleting names by IP');
+    }
+  };
+
+  const handleSaveWebsiteSettings = async () => {
+    try {
+      const response = await fetch('/api/admin-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Admin-Key': password,
+        },
+        body: JSON.stringify({
+          guestbookLocked,
+          guestbookLockMessage,
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setGuestbookLocked(Boolean(data.guestbook_locked));
+        setGuestbookLockMessage(data.guestbook_lock_message || guestbookLockMessage);
+        setStatus('Website settings saved.');
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setStatus('Network error saving website settings');
+    }
+  };
+
+  const filteredNames = useMemo(() => {
+    const term = nameSearch.trim().toLowerCase();
+
+    const filtered = namesList.filter((entry) => {
+      if (!term) return true;
+      const searchText = [
+        entry.name,
+        entry.ip_address,
+        entry.country,
+        entry.city,
+        entry.asn,
+        entry.user_agent,
+      ].join(' ').toLowerCase();
+
+      return searchText.includes(term);
+    });
+
+    filtered.sort((a, b) => {
+      const aTs = new Date(a.created_at).getTime();
+      const bTs = new Date(b.created_at).getTime();
+      return sortDirection === 'desc' ? bTs - aTs : aTs - bTs;
+    });
+
+    return filtered;
+  }, [namesList, nameSearch, sortDirection]);
+
+  const stats = useMemo(() => {
+    const uniqueIps = new Set(namesList.map((n) => n.ip_address).filter(Boolean));
+    return {
+      totalNames: namesList.length,
+      uniqueIps: uniqueIps.size,
+      activeBans: bannedIps.length,
+      guestbookStatus: guestbookLocked ? 'Locked' : 'Open',
+    };
+  }, [namesList, bannedIps, guestbookLocked]);
 
   const formatBanExpiry = (expiresAt) => {
     if (!expiresAt) return 'Permanent';
@@ -238,111 +401,208 @@ export default function Admin() {
 
         {status && <p style={styles.status}>{status}</p>}
 
-        <div style={styles.configCard}>
-          <h3 style={styles.sectionHeading}>Ban Configuration</h3>
-          <div style={styles.banConfigRow}>
-            <input
-              type="text"
-              value={banReason}
-              onChange={(e) => setBanReason(e.target.value)}
-              placeholder="Ban reason shown to user"
-              style={styles.configInput}
-            />
+        <div style={styles.tabBar}>
+          <button onClick={() => setActiveTab('overview')} style={activeTab === 'overview' ? styles.activeTabBtn : styles.tabBtn}>Overview</button>
+          <button onClick={() => setActiveTab('names')} style={activeTab === 'names' ? styles.activeTabBtn : styles.tabBtn}>Names</button>
+          <button onClick={() => setActiveTab('bans')} style={activeTab === 'bans' ? styles.activeTabBtn : styles.tabBtn}>Bans</button>
+          <button onClick={() => setActiveTab('website')} style={activeTab === 'website' ? styles.activeTabBtn : styles.tabBtn}>Website</button>
+          <button onClick={() => refreshAll(password)} style={styles.secondaryBtn}>Refresh</button>
+        </div>
 
-            <input
-              type="number"
-              min="1"
-              value={banDurationUnit === 'permanent' ? '' : banDurationValue}
-              onChange={(e) => setBanDurationValue(e.target.value)}
-              placeholder="Duration"
-              style={{ ...styles.configInput, maxWidth: '120px' }}
-              disabled={banDurationUnit === 'permanent'}
-            />
-
-            <select
-              value={banDurationUnit}
-              onChange={(e) => setBanDurationUnit(e.target.value)}
-              style={styles.configSelect}
-            >
-              <option value="minutes">Minutes</option>
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
-              <option value="permanent">Permanent</option>
-            </select>
+        {activeTab === 'overview' && (
+          <div style={styles.sectionCard}>
+            <h3 style={styles.sectionHeading}>Overview</h3>
+            <div style={styles.statsGrid}>
+              <div style={styles.statCard}><strong>Total names:</strong><br />{stats.totalNames}</div>
+              <div style={styles.statCard}><strong>Unique IPs:</strong><br />{stats.uniqueIps}</div>
+              <div style={styles.statCard}><strong>Active bans:</strong><br />{stats.activeBans}</div>
+              <div style={styles.statCard}><strong>Guestbook:</strong><br />{stats.guestbookStatus}</div>
+            </div>
           </div>
-        </div>
+        )}
 
-        <h3 style={styles.sectionHeading}>Guestbook Entries</h3>
-        <ul style={styles.list}>
-          <AnimatePresence>
-            {namesList.map((entry) => (
-              <motion.li
-                key={entry.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                style={styles.listItem}
-              >
-                <div>
-                  <span style={styles.listName}>{entry.name}</span>
-                  <br />
-                  <span style={styles.listDate}>
-                    {new Date(entry.created_at).toLocaleString()} (ID: {entry.id})
-                  </span>
-                  {entry.ip_address && (
-                    <div style={styles.detailsContainer}>
-                      <span style={styles.detailItem}><strong>IP:</strong> {entry.ip_address}</span>
-                      <span style={styles.detailItem}><strong>Location:</strong> {entry.city ? `${entry.city}, ` : ''}{entry.country}</span>
-                      <span style={styles.detailItem}><strong>ASN:</strong> {entry.asn}</span>
-                      <span style={styles.detailItem}><strong>Device:</strong> {entry.user_agent}</span>
-                    </div>
-                  )}
-                </div>
-                <div style={styles.actionGroup}>
-                  {entry.ip_address && (
-                    <button
-                      onClick={() => handleBan(entry.ip_address)}
-                      style={styles.banBtn}
-                    >
-                      Ban IP
-                    </button>
-                  )}
-                  <button
-                    onClick={() => handleDelete(entry.id)}
-                    style={styles.deleteBtn}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </motion.li>
-            ))}
-          </AnimatePresence>
-          {namesList.length === 0 && <p>No signatures found.</p>}
-        </ul>
+        {activeTab === 'names' && (
+          <>
+            <div style={styles.sectionCard}>
+              <h3 style={styles.sectionHeading}>Name Controls</h3>
+              <div style={styles.controlRow}>
+                <input
+                  type="text"
+                  value={nameSearch}
+                  onChange={(e) => setNameSearch(e.target.value)}
+                  placeholder="Search by name/IP/country/city/device"
+                  style={styles.configInput}
+                />
+                <select
+                  value={sortDirection}
+                  onChange={(e) => setSortDirection(e.target.value)}
+                  style={styles.configSelect}
+                >
+                  <option value="desc">Newest first</option>
+                  <option value="asc">Oldest first</option>
+                </select>
+              </div>
+              <div style={styles.controlRow}>
+                <input
+                  type="text"
+                  value={deleteIpInput}
+                  onChange={(e) => setDeleteIpInput(e.target.value)}
+                  placeholder="Delete all names by IP"
+                  style={styles.configInput}
+                />
+                <button onClick={handleDeleteNamesByIp} style={styles.deleteBtn}>Delete by IP</button>
+                <button onClick={handleDeleteAllNames} style={styles.deleteBtn}>Delete ALL names</button>
+              </div>
+            </div>
 
-        <div style={{ marginTop: '2rem' }}>
-          <h3 style={styles.sectionHeading}>Active Bans</h3>
-          {bannedIps.length === 0 ? (
-            <p style={{ color: '#aaa', margin: 0 }}>No active bans.</p>
-          ) : (
+            <h3 style={styles.sectionHeading}>Guestbook Entries</h3>
             <ul style={styles.list}>
-              {bannedIps.map((ban) => (
-                <li key={ban.id} style={styles.listItem}>
-                  <div>
-                    <span style={styles.listName}>{ban.ip_address}</span>
-                    <div style={styles.detailsContainer}>
-                      <span style={styles.detailItem}><strong>Reason:</strong> {ban.reason || 'No reason provided'}</span>
-                      <span style={styles.detailItem}><strong>Expires:</strong> {formatBanExpiry(ban.expires_at)}</span>
-                      <span style={styles.detailItem}><strong>Banned at:</strong> {new Date(ban.created_at).toLocaleString()}</span>
+              <AnimatePresence>
+                {filteredNames.map((entry) => (
+                  <motion.li
+                    key={entry.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    style={styles.listItem}
+                  >
+                    <div>
+                      <span style={styles.listName}>{entry.name}</span>
+                      <br />
+                      <span style={styles.listDate}>
+                        {new Date(entry.created_at).toLocaleString()} (ID: {entry.id})
+                      </span>
+                      {entry.ip_address && (
+                        <div style={styles.detailsContainer}>
+                          <span style={styles.detailItem}><strong>IP:</strong> {entry.ip_address}</span>
+                          <span style={styles.detailItem}><strong>Location:</strong> {entry.city ? `${entry.city}, ` : ''}{entry.country}</span>
+                          <span style={styles.detailItem}><strong>ASN:</strong> {entry.asn}</span>
+                          <span style={styles.detailItem}><strong>Device:</strong> {entry.user_agent}</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <button onClick={() => handleUnban(ban.ip_address)} style={styles.unbanBtn}>Unban</button>
-                </li>
-              ))}
+                    <div style={styles.actionGroup}>
+                      {entry.ip_address && (
+                        <button
+                          onClick={() => handleBan(entry.ip_address)}
+                          style={styles.banBtn}
+                        >
+                          Ban IP
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDelete(entry.id)}
+                        style={styles.deleteBtn}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+              {filteredNames.length === 0 && <p>No signatures found.</p>}
             </ul>
-          )}
-        </div>
+          </>
+        )}
+
+        {activeTab === 'bans' && (
+          <>
+            <div style={styles.configCard}>
+              <h3 style={styles.sectionHeading}>Ban Configuration</h3>
+              <div style={styles.banConfigRow}>
+                <input
+                  type="text"
+                  value={banReason}
+                  onChange={(e) => setBanReason(e.target.value)}
+                  placeholder="Ban reason shown to user"
+                  style={styles.configInput}
+                />
+
+                <input
+                  type="number"
+                  min="1"
+                  value={banDurationUnit === 'permanent' ? '' : banDurationValue}
+                  onChange={(e) => setBanDurationValue(e.target.value)}
+                  placeholder="Duration"
+                  style={{ ...styles.configInput, maxWidth: '120px' }}
+                  disabled={banDurationUnit === 'permanent'}
+                />
+
+                <select
+                  value={banDurationUnit}
+                  onChange={(e) => setBanDurationUnit(e.target.value)}
+                  style={styles.configSelect}
+                >
+                  <option value="minutes">Minutes</option>
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                  <option value="weeks">Weeks</option>
+                  <option value="permanent">Permanent</option>
+                </select>
+              </div>
+
+              <div style={styles.manualActionRow}>
+                <input
+                  type="text"
+                  value={manualIp}
+                  onChange={(e) => setManualIp(e.target.value)}
+                  placeholder="Type IP manually (e.g. 1.2.3.4)"
+                  style={styles.configInput}
+                />
+                <button onClick={handleManualBanOrExtend} style={styles.banBtn}>
+                  Ban / Extend IP
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1rem' }}>
+              <h3 style={styles.sectionHeading}>Active Bans</h3>
+              {bannedIps.length === 0 ? (
+                <p style={{ color: '#aaa', margin: 0 }}>No active bans.</p>
+              ) : (
+                <ul style={styles.list}>
+                  {bannedIps.map((ban) => (
+                    <li key={ban.id} style={styles.listItem}>
+                      <div>
+                        <span style={styles.listName}>{ban.ip_address}</span>
+                        <div style={styles.detailsContainer}>
+                          <span style={styles.detailItem}><strong>Reason:</strong> {ban.reason || 'No reason provided'}</span>
+                          <span style={styles.detailItem}><strong>Expires:</strong> {formatBanExpiry(ban.expires_at)}</span>
+                          <span style={styles.detailItem}><strong>Banned at:</strong> {new Date(ban.created_at).toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div style={styles.actionGroup}>
+                        <button onClick={() => handleBan(ban.ip_address)} style={styles.banBtn}>Extend</button>
+                        <button onClick={() => handleUnban(ban.ip_address)} style={styles.unbanBtn}>Unban</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeTab === 'website' && (
+          <div style={styles.sectionCard}>
+            <h3 style={styles.sectionHeading}>Website Controls</h3>
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={guestbookLocked}
+                onChange={(e) => setGuestbookLocked(e.target.checked)}
+              />
+              Lock guestbook submissions
+            </label>
+            <textarea
+              value={guestbookLockMessage}
+              onChange={(e) => setGuestbookLockMessage(e.target.value)}
+              placeholder="Message shown while guestbook is locked"
+              style={styles.textArea}
+            />
+            <button onClick={handleSaveWebsiteSettings} style={styles.button}>Save Website Settings</button>
+          </div>
+        )}
       </motion.div>
     </div>
   );
@@ -404,6 +664,79 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
   },
+  secondaryBtn: {
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: '1px solid rgba(255,255,255,0.2)',
+    background: 'transparent',
+    color: '#fff',
+    cursor: 'pointer',
+  },
+  tabBar: {
+    display: 'flex',
+    gap: '0.5rem',
+    flexWrap: 'wrap',
+    marginBottom: '1rem',
+  },
+  tabBtn: {
+    padding: '8px 10px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#ddd',
+    cursor: 'pointer',
+  },
+  activeTabBtn: {
+    padding: '8px 10px',
+    borderRadius: '8px',
+    border: '1px solid rgba(100,108,255,0.5)',
+    background: 'rgba(100,108,255,0.25)',
+    color: '#fff',
+    cursor: 'pointer',
+  },
+  sectionCard: {
+    background: 'rgba(0,0,0,0.2)',
+    borderRadius: '10px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    padding: '1rem',
+    marginBottom: '1rem',
+  },
+  controlRow: {
+    display: 'flex',
+    gap: '0.6rem',
+    flexWrap: 'wrap',
+    marginBottom: '0.8rem',
+  },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+    gap: '0.7rem',
+  },
+  statCard: {
+    padding: '0.75rem',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(0,0,0,0.22)',
+    color: '#ddd',
+  },
+  checkboxRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    marginBottom: '0.8rem',
+    color: '#fff',
+  },
+  textArea: {
+    width: '100%',
+    minHeight: '90px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.2)',
+    background: 'rgba(0,0,0,0.2)',
+    color: 'white',
+    padding: '10px 12px',
+    resize: 'vertical',
+    marginBottom: '0.8rem',
+  },
   configCard: {
     background: 'rgba(0,0,0,0.2)',
     borderRadius: '10px',
@@ -414,6 +747,12 @@ const styles = {
   banConfigRow: {
     display: 'flex',
     gap: '0.6rem',
+    flexWrap: 'wrap',
+  },
+  manualActionRow: {
+    display: 'flex',
+    gap: '0.6rem',
+    marginTop: '0.8rem',
     flexWrap: 'wrap',
   },
   configInput: {
