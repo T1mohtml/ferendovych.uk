@@ -1,5 +1,15 @@
 export const onRequestGet = async ({ request, env }) => {
   try {
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS banned_ips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ip_address TEXT NOT NULL UNIQUE,
+        reason TEXT,
+        expires_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`
+    ).run();
+
     const adminKey = request.headers.get("Admin-Key");
 
     if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {

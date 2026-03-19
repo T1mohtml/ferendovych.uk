@@ -2,6 +2,16 @@ import { badWords } from '../bad-words.js';
 
 export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS banned_ips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ip_address TEXT NOT NULL UNIQUE,
+        reason TEXT,
+        expires_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`
+    ).run();
+
     const { name, token } = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
     const country = request.headers.get("CF-IPCountry") || request.cf?.country || "Local";
