@@ -142,6 +142,12 @@ function SkidBanner() {
 }
 
 export default function Home() {
+  const skillLinks = {
+    React: 'https://react.dev/',
+    JavaScript: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
+    CSS: 'https://developer.mozilla.org/en-US/docs/Web/CSS',
+  };
+
   // Remove scroll disable - page is now scrollable
 
   // Set dynamic page title and force scroll to top
@@ -410,8 +416,11 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 1.1 }}
           >
             {['React', 'JavaScript', 'CSS'].map((skill, index) => (
-              <motion.span
+              <motion.a
                 key={skill}
+                href={skillLinks[skill]}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={styles.skillBadge}
                 initial={{ opacity: 0, scale: 0 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -431,7 +440,7 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
               >
                 {skill}
-              </motion.span>
+              </motion.a>
             ))}
             </motion.div>
           </motion.div>

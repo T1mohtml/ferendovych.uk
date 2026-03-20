@@ -64,6 +64,10 @@ function AppShell({ darkMode, toggleMode }) {
 
   const isAdminRoute = location.pathname.startsWith('/admin');
   const showAnnouncement = !isAdminRoute && siteStatus.announcementEnabled && siteStatus.announcementMessage;
+  const navVisible = !siteStatus.hideNavigationEnabled;
+  const themeTopOffset = navVisible
+    ? (showAnnouncement ? 132 : 88)
+    : (showAnnouncement ? 64 : 20);
 
   if (!siteStatus.loaded) {
     return null;
@@ -86,8 +90,8 @@ function AppShell({ darkMode, toggleMode }) {
       {showAnnouncement && (
         <div style={styles.announcementBar}>{siteStatus.announcementMessage}</div>
       )}
-      {!siteStatus.hideNavigationEnabled && <Navigation topOffset={showAnnouncement ? 44 : 0} />}
-      <ThemeToggle darkMode={darkMode} toggleMode={toggleMode} />
+      {navVisible && <Navigation topOffset={showAnnouncement ? 44 : 0} darkMode={darkMode} />}
+      <ThemeToggle darkMode={darkMode} toggleMode={toggleMode} topOffset={themeTopOffset} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/climbing" element={<Climbing />} />
@@ -99,12 +103,18 @@ function AppShell({ darkMode, toggleMode }) {
 }
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') return true;
+    if (savedTheme === 'light') return false;
+    return true;
+  });
   const [banState, setBanState] = useState({ loading: true, banned: false, reason: '', expires_at: null });
 
   useEffect(() => {
     document.body.style.backgroundColor = darkMode ? "#1a1a1a" : "#f0f0f0";
     document.body.style.color = darkMode ? "#f0f0f0" : "#1a1a1a";
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
   useEffect(() => {
@@ -132,7 +142,7 @@ function App() {
     checkBan();
   }, []);
 
-  const toggleMode = () => setDarkMode(!darkMode);
+  const toggleMode = () => setDarkMode((prev) => !prev);
 
   if (banState.loading) {
     return null;

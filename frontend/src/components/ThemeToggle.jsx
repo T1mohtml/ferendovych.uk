@@ -1,9 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function ThemeToggle({ darkMode, toggleMode }) {
+export default function ThemeToggle({ darkMode, toggleMode, topOffset = 20 }) {
   return (
-    <div style={styles.toggleWrapper} onClick={toggleMode}>
+    <div style={{ ...styles.toggleWrapper, top: `${topOffset}px` }} onClick={toggleMode}>
       <motion.div
         layout
         transition={{ type: "spring", stiffness: 700, damping: 30 }}
@@ -22,7 +22,6 @@ export default function ThemeToggle({ darkMode, toggleMode }) {
 const styles = {
   toggleWrapper: {
     position: "fixed",
-    top: "20px",
     left: "20px",
     width: "60px",
     height: "30px",

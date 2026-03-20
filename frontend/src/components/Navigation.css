@@ -58,6 +58,24 @@
   font-size: 1rem;
 }
 
+.navbar.navbar-dark {
+  background-color: rgba(20, 20, 20, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar.navbar-dark .nav-logo-link {
+  color: #9aa2ff;
+}
+
+.navbar.navbar-dark .nav-link {
+  color: #f0f0f0;
+}
+
+.navbar.navbar-dark .nav-link.active {
+  background-color: #8b5cf6;
+  color: #fff;
+}
+
 /* Mobile styles */
 @media (max-width: 768px) {
   .nav-container {

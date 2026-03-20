@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./Navigation.css";
 
-export default function Navigation({ topOffset = 0 }) {
+export default function Navigation({ topOffset = 0, darkMode = false }) {
   const location = useLocation();
 
   const navItems = [
@@ -14,7 +14,7 @@ export default function Navigation({ topOffset = 0 }) {
 
   return (
     <motion.nav
-      className="navbar"
+      className={`navbar ${darkMode ? 'navbar-dark' : ''}`}
       style={{ top: `${topOffset}px` }}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
