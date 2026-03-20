@@ -10,6 +10,19 @@ export const onRequestPost = async ({ request, env }) => {
       )`
     ).run();
 
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS operations_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        op_name TEXT NOT NULL,
+        actor_type TEXT,
+        actor TEXT,
+        target TEXT,
+        details TEXT,
+        status TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`
+    ).run();
+
     const { results: cols } = await env.DB.prepare("PRAGMA table_info(banned_asns)").run();
     const colNames = new Set((cols || []).map((col) => col.name));
     if (!colNames.has("expires_at")) {
@@ -62,6 +75,11 @@ export const onRequestPost = async ({ request, env }) => {
     if (!success) {
       throw new Error("Failed to ban ASN");
     }
+
+    await env.DB.prepare(
+      `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind('admin_ban_asn', 'admin', 'panel', normalizedAsn, finalReason, 'ok').run();
 
     return new Response(JSON.stringify({
       message: `ASN ${normalizedAsn} banned successfully`,

@@ -10,6 +10,19 @@ export const onRequestPost = async ({ request, env }) => {
       )`
     ).run();
 
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS operations_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        op_name TEXT NOT NULL,
+        actor_type TEXT,
+        actor TEXT,
+        target TEXT,
+        details TEXT,
+        status TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`
+    ).run();
+
     const adminKey = request.headers.get("Admin-Key");
     if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -34,6 +47,11 @@ export const onRequestPost = async ({ request, env }) => {
     if (!success) {
       throw new Error("Failed to unban ASN");
     }
+
+    await env.DB.prepare(
+      `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind('admin_unban_asn', 'admin', 'panel', normalizedAsn, 'manual_unban', 'ok').run();
 
     return new Response(JSON.stringify({ message: `ASN ${normalizedAsn} unbanned successfully` }), {
       status: 200,

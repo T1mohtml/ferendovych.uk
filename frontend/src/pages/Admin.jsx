@@ -26,6 +26,7 @@ export default function Admin() {
   const [subnetProtectionEnabled, setSubnetProtectionEnabled] = useState(true);
   const [autoBanEnabled, setAutoBanEnabled] = useState(true);
   const [diagnostics, setDiagnostics] = useState(null);
+  const [operationsData, setOperationsData] = useState(null);
 
   useEffect(() => {
     const storedKey = sessionStorage.getItem('adminKey');
@@ -43,6 +44,7 @@ export default function Admin() {
       fetchBannedAsns(adminKey),
       fetchAdminSettings(adminKey),
       fetchDiagnostics(adminKey),
+      fetchOperations(adminKey),
     ]);
   };
 
@@ -129,6 +131,22 @@ export default function Admin() {
       }
     } catch (error) {
       console.error('Failed to fetch diagnostics:', error);
+    }
+  };
+
+  const fetchOperations = async (adminKey = password) => {
+    try {
+      const response = await fetch('/api/admin-operations', {
+        headers: {
+          'Admin-Key': adminKey
+        }
+      });
+
+      if (response.ok) {
+        setOperationsData(await response.json());
+      }
+    } catch (error) {
+      console.error('Failed to fetch operations:', error);
     }
   };
 
@@ -827,6 +845,7 @@ export default function Admin() {
               <h3 style={styles.sectionHeading}>Server Diagnostics</h3>
               <div style={styles.controlRow}>
                 <button onClick={() => fetchDiagnostics(password)} style={styles.secondaryBtn}>Refresh Diagnostics</button>
+                <button onClick={() => fetchOperations(password)} style={styles.secondaryBtn}>Refresh Operations</button>
               </div>
               {diagnostics ? (
                 <div style={styles.detailsContainer}>
@@ -848,6 +867,45 @@ export default function Admin() {
                 </div>
               ) : (
                 <p style={{ color: '#aaa', marginTop: '0.6rem' }}>No diagnostics loaded yet.</p>
+              )}
+            </div>
+
+            <div style={{ marginTop: '1rem' }}>
+              <h3 style={styles.sectionHeading}>Server Operations</h3>
+              {operationsData ? (
+                <>
+                  <div style={styles.detailsContainer}>
+                    {(operationsData.activeOperations || []).map((op) => (
+                      <span key={op.op_name} style={styles.detailItem}>
+                        <strong>{op.op_name}:</strong> {op.count} in last 5 min
+                      </span>
+                    ))}
+                    {(operationsData.activeOperations || []).length === 0 && (
+                      <span style={styles.detailItem}>No high activity in the last 5 minutes.</span>
+                    )}
+                  </div>
+
+                  <div style={{ marginTop: '0.8rem', maxHeight: '280px', overflowY: 'auto' }}>
+                    <ul style={styles.list}>
+                      {(operationsData.recentOperations || []).slice(0, 40).map((op) => (
+                        <li key={op.id} style={styles.listItem}>
+                          <div>
+                            <span style={styles.listName}>{op.op_name}</span>
+                            <div style={styles.detailsContainer}>
+                              <span style={styles.detailItem}><strong>When:</strong> {new Date(op.created_at).toLocaleString()}</span>
+                              <span style={styles.detailItem}><strong>Status:</strong> {op.status || 'unknown'}</span>
+                              <span style={styles.detailItem}><strong>Actor:</strong> {op.actor_type || 'n/a'} / {op.actor || 'n/a'}</span>
+                              <span style={styles.detailItem}><strong>Target:</strong> {op.target || 'n/a'}</span>
+                              <span style={styles.detailItem}><strong>Details:</strong> {op.details || 'n/a'}</span>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <p style={{ color: '#aaa', marginTop: '0.6rem' }}>No operations loaded yet.</p>
               )}
             </div>
           </div>

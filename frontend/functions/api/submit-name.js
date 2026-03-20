@@ -72,6 +72,30 @@ const ensureSecurityTables = async (env) => {
       window_start TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`
   ).run();
+
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS operations_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      op_name TEXT NOT NULL,
+      actor_type TEXT,
+      actor TEXT,
+      target TEXT,
+      details TEXT,
+      status TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`
+  ).run();
+};
+
+const logOperation = async (env, { opName, actorType, actor, target, details, status }) => {
+  try {
+    await env.DB.prepare(
+      `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind(opName, actorType || null, actor || null, target || null, details || null, status || 'ok').run();
+  } catch {
+    // ignore logging failures
+  }
 };
 
 const getSubnetKey = (ip) => {
@@ -186,6 +210,14 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
 
     if (banned && banned.length > 0) {
       const activeBan = banned[0];
+      await logOperation(env, {
+        opName: 'submit_name',
+        actorType: 'visitor',
+        actor: ip,
+        target: name,
+        details: 'blocked_by_ip_ban',
+        status: 'blocked',
+      });
       return new Response(JSON.stringify({
         error: "You are banned from this website.",
         reason: activeBan.reason || "No reason provided.",
@@ -203,6 +235,14 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
 
     if (bannedAsns && bannedAsns.length > 0) {
       const activeBan = bannedAsns[0];
+      await logOperation(env, {
+        opName: 'submit_name',
+        actorType: 'visitor',
+        actor: ip,
+        target: String(asn),
+        details: 'blocked_by_asn_ban',
+        status: 'blocked',
+      });
       return new Response(JSON.stringify({
         error: "Your network provider is banned from this website.",
         reason: activeBan.reason || "No reason provided.",
@@ -230,6 +270,14 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
     const autoBanEnabled = settingsMap.get('auto_ban_enabled') !== '0';
 
     if (guestbookLocked) {
+      await logOperation(env, {
+        opName: 'submit_name',
+        actorType: 'visitor',
+        actor: ip,
+        target: name,
+        details: 'blocked_guestbook_locked',
+        status: 'blocked',
+      });
       return new Response(JSON.stringify({
         error: settingsMap.get('guestbook_lock_message') || 'Guestbook is temporarily locked by admin.',
         code: 'GUESTBOOK_LOCKED',
@@ -372,6 +420,15 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
       .run();
 
     if (success) {
+      await logOperation(env, {
+        opName: 'submit_name',
+        actorType: 'visitor',
+        actor: ip,
+        target: name,
+        details: `asn=${asn};country=${country}`,
+        status: 'ok',
+      });
+
       if (env.DISCORD_WEBHOOK_URL) {
         waitUntil(
           fetch(env.DISCORD_WEBHOOK_URL, {

@@ -6,6 +6,19 @@ const ensureSettingsTable = async (env) => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`
   ).run();
+
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS operations_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      op_name TEXT NOT NULL,
+      actor_type TEXT,
+      actor TEXT,
+      target TEXT,
+      details TEXT,
+      status TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`
+  ).run();
 };
 
 const upsertSetting = async (env, key, value) => {
@@ -102,6 +115,18 @@ export const onRequestPost = async ({ request, env }) => {
     await upsertSetting(env, 'cooldown_minutes', String(cooldownMinutes));
     await upsertSetting(env, 'subnet_protection_enabled', subnetProtectionEnabled ? '1' : '0');
     await upsertSetting(env, 'auto_ban_enabled', autoBanEnabled ? '1' : '0');
+
+    await env.DB.prepare(
+      `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind(
+      'admin_save_settings',
+      'admin',
+      'panel',
+      'site_settings',
+      `locked=${guestbookLocked};cooldown=${cooldownEnabled}:${cooldownMinutes};subnet=${subnetProtectionEnabled};autoban=${autoBanEnabled}`,
+      'ok'
+    ).run();
 
     return new Response(JSON.stringify({
       message: 'Settings saved.',

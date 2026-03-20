@@ -10,6 +10,19 @@ export const onRequestPost = async ({ request, env }) => {
       )`
     ).run();
 
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS operations_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        op_name TEXT NOT NULL,
+        actor_type TEXT,
+        actor TEXT,
+        target TEXT,
+        details TEXT,
+        status TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`
+    ).run();
+
     const { results: bannedColumns } = await env.DB.prepare("PRAGMA table_info(banned_ips)").run();
     const bannedColumnNames = new Set((bannedColumns || []).map((col) => col.name));
     if (!bannedColumnNames.has("expires_at")) {
@@ -70,6 +83,11 @@ export const onRequestPost = async ({ request, env }) => {
       .run();
 
     if (success) {
+      await env.DB.prepare(
+        `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      ).bind('admin_ban_ip', 'admin', 'panel', normalizedIp, finalReason, 'ok').run();
+
       return new Response(JSON.stringify({
         message: `IP ${normalizedIp} banned successfully`,
         ban: {

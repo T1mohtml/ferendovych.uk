@@ -42,6 +42,18 @@ CREATE TABLE IF NOT EXISTS subnet_rate_limits (
   window_start TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS operations_log;
+CREATE TABLE IF NOT EXISTS operations_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  op_name TEXT NOT NULL,
+  actor_type TEXT,
+  actor TEXT,
+  target TEXT,
+  details TEXT,
+  status TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 DROP TABLE IF EXISTS site_settings;
 CREATE TABLE IF NOT EXISTS site_settings (
   key TEXT PRIMARY KEY,
