@@ -25,7 +25,7 @@ function AppShell({ darkMode, toggleMode }) {
         const response = await fetch('/api/site-status');
         const data = await response.json();
         if (response.ok) {
-          setSiteStatus({ loaded: true, ...siteStatus, ...data });
+          setSiteStatus((prev) => ({ ...prev, ...data, loaded: true }));
           return;
         }
       } catch {
