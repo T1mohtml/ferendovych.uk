@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./Navigation.css";
 
-export default function Navigation() {
+export default function Navigation({ topOffset = 0 }) {
   const location = useLocation();
 
   const navItems = [
@@ -15,6 +15,7 @@ export default function Navigation() {
   return (
     <motion.nav
       className="navbar"
+      style={{ top: `${topOffset}px` }}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}

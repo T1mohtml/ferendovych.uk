@@ -32,7 +32,16 @@ function AppShell({ darkMode, toggleMode }) {
         });
         const data = await response.json();
         if (!cancelled && response.ok) {
-          setSiteStatus((prev) => ({ ...prev, ...data, loaded: true }));
+          const normalized = {
+            underConstructionEnabled: data.underConstructionEnabled ?? data.under_construction_enabled ?? false,
+            underConstructionTitle: data.underConstructionTitle ?? data.under_construction_title ?? 'Under Construction',
+            underConstructionMessage: data.underConstructionMessage ?? data.under_construction_message ?? 'This website is currently under construction. Please check back soon.',
+            announcementEnabled: data.announcementEnabled ?? data.announcement_enabled ?? false,
+            announcementMessage: data.announcementMessage ?? data.announcement_message ?? '',
+            hideNavigationEnabled: data.hideNavigationEnabled ?? data.hide_navigation_enabled ?? false,
+          };
+
+          setSiteStatus((prev) => ({ ...prev, ...normalized, loaded: true }));
           return;
         }
       } catch {
@@ -54,6 +63,7 @@ function AppShell({ darkMode, toggleMode }) {
   }, [location.pathname]);
 
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const showAnnouncement = !isAdminRoute && siteStatus.announcementEnabled && siteStatus.announcementMessage;
 
   if (!siteStatus.loaded) {
     return null;
@@ -73,10 +83,10 @@ function AppShell({ darkMode, toggleMode }) {
 
   return (
     <>
-      {!isAdminRoute && siteStatus.announcementEnabled && siteStatus.announcementMessage && (
+      {showAnnouncement && (
         <div style={styles.announcementBar}>{siteStatus.announcementMessage}</div>
       )}
-      {!siteStatus.hideNavigationEnabled && <Navigation />}
+      {!siteStatus.hideNavigationEnabled && <Navigation topOffset={showAnnouncement ? 44 : 0} />}
       <ThemeToggle darkMode={darkMode} toggleMode={toggleMode} />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -182,9 +192,11 @@ const styles = {
     color: '#ddd',
   },
   announcementBar: {
-    position: 'sticky',
+    position: 'fixed',
     top: 0,
-    zIndex: 1000,
+    left: 0,
+    right: 0,
+    zIndex: 1200,
     width: '100%',
     padding: '10px 14px',
     textAlign: 'center',
