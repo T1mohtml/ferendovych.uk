@@ -39,7 +39,13 @@ const getSettings = async (env) => {
       'cooldown_enabled',
       'cooldown_minutes',
       'subnet_protection_enabled',
-      'auto_ban_enabled'
+      'auto_ban_enabled',
+      'under_construction_enabled',
+      'under_construction_title',
+      'under_construction_message',
+      'announcement_enabled',
+      'announcement_message',
+      'hide_navigation_enabled'
     )`
   ).run();
 
@@ -57,6 +63,12 @@ const getSettings = async (env) => {
     cooldown_minutes: cooldownMinutes,
     subnet_protection_enabled: map.get('subnet_protection_enabled') !== '0',
     auto_ban_enabled: map.get('auto_ban_enabled') !== '0',
+    under_construction_enabled: map.get('under_construction_enabled') === '1',
+    under_construction_title: map.get('under_construction_title') || 'Under Construction',
+    under_construction_message: map.get('under_construction_message') || 'This website is currently under construction. Please check back soon.',
+    announcement_enabled: map.get('announcement_enabled') === '1',
+    announcement_message: map.get('announcement_message') || '',
+    hide_navigation_enabled: map.get('hide_navigation_enabled') === '1',
   };
 };
 
@@ -108,6 +120,12 @@ export const onRequestPost = async ({ request, env }) => {
     const cooldownMinutes = Number.isFinite(cooldownMinutesRaw) && cooldownMinutesRaw > 0 ? cooldownMinutesRaw : 5;
     const subnetProtectionEnabled = body?.subnetProtectionEnabled !== false;
     const autoBanEnabled = body?.autoBanEnabled !== false;
+    const underConstructionEnabled = body?.underConstructionEnabled === true;
+    const underConstructionTitle = String(body?.underConstructionTitle || 'Under Construction').trim() || 'Under Construction';
+    const underConstructionMessage = String(body?.underConstructionMessage || 'This website is currently under construction. Please check back soon.').trim() || 'This website is currently under construction. Please check back soon.';
+    const announcementEnabled = body?.announcementEnabled === true;
+    const announcementMessage = String(body?.announcementMessage || '').trim();
+    const hideNavigationEnabled = body?.hideNavigationEnabled === true;
 
     await upsertSetting(env, 'guestbook_locked', guestbookLocked ? '1' : '0');
     await upsertSetting(env, 'guestbook_lock_message', guestbookLockMessage);
@@ -115,6 +133,12 @@ export const onRequestPost = async ({ request, env }) => {
     await upsertSetting(env, 'cooldown_minutes', String(cooldownMinutes));
     await upsertSetting(env, 'subnet_protection_enabled', subnetProtectionEnabled ? '1' : '0');
     await upsertSetting(env, 'auto_ban_enabled', autoBanEnabled ? '1' : '0');
+    await upsertSetting(env, 'under_construction_enabled', underConstructionEnabled ? '1' : '0');
+    await upsertSetting(env, 'under_construction_title', underConstructionTitle);
+    await upsertSetting(env, 'under_construction_message', underConstructionMessage);
+    await upsertSetting(env, 'announcement_enabled', announcementEnabled ? '1' : '0');
+    await upsertSetting(env, 'announcement_message', announcementMessage);
+    await upsertSetting(env, 'hide_navigation_enabled', hideNavigationEnabled ? '1' : '0');
 
     await env.DB.prepare(
       `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
@@ -136,6 +160,12 @@ export const onRequestPost = async ({ request, env }) => {
       cooldown_minutes: cooldownMinutes,
       subnet_protection_enabled: subnetProtectionEnabled,
       auto_ban_enabled: autoBanEnabled,
+      under_construction_enabled: underConstructionEnabled,
+      under_construction_title: underConstructionTitle,
+      under_construction_message: underConstructionMessage,
+      announcement_enabled: announcementEnabled,
+      announcement_message: announcementMessage,
+      hide_navigation_enabled: hideNavigationEnabled,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

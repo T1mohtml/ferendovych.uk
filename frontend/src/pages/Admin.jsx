@@ -25,6 +25,12 @@ export default function Admin() {
   const [cooldownMinutes, setCooldownMinutes] = useState(5);
   const [subnetProtectionEnabled, setSubnetProtectionEnabled] = useState(true);
   const [autoBanEnabled, setAutoBanEnabled] = useState(true);
+  const [underConstructionEnabled, setUnderConstructionEnabled] = useState(false);
+  const [underConstructionTitle, setUnderConstructionTitle] = useState('Under Construction');
+  const [underConstructionMessage, setUnderConstructionMessage] = useState('This website is currently under construction. Please check back soon.');
+  const [announcementEnabled, setAnnouncementEnabled] = useState(false);
+  const [announcementMessage, setAnnouncementMessage] = useState('');
+  const [hideNavigationEnabled, setHideNavigationEnabled] = useState(false);
   const [diagnostics, setDiagnostics] = useState(null);
   const [operationsData, setOperationsData] = useState(null);
 
@@ -112,6 +118,12 @@ export default function Admin() {
         setCooldownMinutes(Number(data.cooldown_minutes || 5));
         setSubnetProtectionEnabled(data.subnet_protection_enabled !== false);
         setAutoBanEnabled(data.auto_ban_enabled !== false);
+        setUnderConstructionEnabled(Boolean(data.under_construction_enabled));
+        setUnderConstructionTitle(data.under_construction_title || 'Under Construction');
+        setUnderConstructionMessage(data.under_construction_message || 'This website is currently under construction. Please check back soon.');
+        setAnnouncementEnabled(Boolean(data.announcement_enabled));
+        setAnnouncementMessage(data.announcement_message || '');
+        setHideNavigationEnabled(Boolean(data.hide_navigation_enabled));
       }
     } catch (error) {
       console.error('Failed to fetch admin settings:', error);
@@ -447,6 +459,12 @@ export default function Admin() {
           cooldownMinutes: Number(cooldownMinutes),
           subnetProtectionEnabled,
           autoBanEnabled,
+          underConstructionEnabled,
+          underConstructionTitle,
+          underConstructionMessage,
+          announcementEnabled,
+          announcementMessage,
+          hideNavigationEnabled,
         })
       });
 
@@ -458,6 +476,12 @@ export default function Admin() {
         setCooldownMinutes(Number(data.cooldown_minutes || 5));
         setSubnetProtectionEnabled(data.subnet_protection_enabled !== false);
         setAutoBanEnabled(data.auto_ban_enabled !== false);
+        setUnderConstructionEnabled(Boolean(data.under_construction_enabled));
+        setUnderConstructionTitle(data.under_construction_title || 'Under Construction');
+        setUnderConstructionMessage(data.under_construction_message || 'This website is currently under construction. Please check back soon.');
+        setAnnouncementEnabled(Boolean(data.announcement_enabled));
+        setAnnouncementMessage(data.announcement_message || '');
+        setHideNavigationEnabled(Boolean(data.hide_navigation_enabled));
         setStatus('Website settings saved.');
         setTimeout(() => setStatus(''), 3000);
       } else {
@@ -837,6 +861,60 @@ export default function Admin() {
                 onChange={(e) => setAutoBanEnabled(e.target.checked)}
               />
               Enable auto-ban from abuse scoring
+            </label>
+
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={underConstructionEnabled}
+                onChange={(e) => setUnderConstructionEnabled(e.target.checked)}
+              />
+              Enable Under Construction mode (all pages except /admin)
+            </label>
+
+            <div style={styles.controlRow}>
+              <input
+                type="text"
+                value={underConstructionTitle}
+                onChange={(e) => setUnderConstructionTitle(e.target.value)}
+                placeholder="Under construction title"
+                style={styles.configInput}
+                disabled={!underConstructionEnabled}
+              />
+            </div>
+
+            <textarea
+              value={underConstructionMessage}
+              onChange={(e) => setUnderConstructionMessage(e.target.value)}
+              placeholder="Under construction message"
+              style={styles.textArea}
+              disabled={!underConstructionEnabled}
+            />
+
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={announcementEnabled}
+                onChange={(e) => setAnnouncementEnabled(e.target.checked)}
+              />
+              Enable global announcement banner
+            </label>
+
+            <textarea
+              value={announcementMessage}
+              onChange={(e) => setAnnouncementMessage(e.target.value)}
+              placeholder="Announcement message"
+              style={styles.textArea}
+              disabled={!announcementEnabled}
+            />
+
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={hideNavigationEnabled}
+                onChange={(e) => setHideNavigationEnabled(e.target.checked)}
+              />
+              Hide top navigation globally
             </label>
 
             <button onClick={handleSaveWebsiteSettings} style={styles.button}>Save Website Settings</button>

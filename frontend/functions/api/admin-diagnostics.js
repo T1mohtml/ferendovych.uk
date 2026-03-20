@@ -89,7 +89,7 @@ export const onRequestGet = async ({ request, env }) => {
       fetchSingleNumber(env, "SELECT COUNT(*) AS c FROM banned_asns WHERE expires_at IS NULL OR datetime(expires_at) > datetime('now')"),
       fetchSingleNumber(env, 'SELECT COUNT(*) AS c FROM abuse_scores WHERE score >= 5'),
       env.DB.prepare('SELECT subnet_key, hit_count, window_start FROM subnet_rate_limits ORDER BY hit_count DESC LIMIT 8').run(),
-      env.DB.prepare("SELECT key, value FROM site_settings WHERE key IN ('guestbook_locked','guestbook_lock_message','cooldown_enabled','cooldown_minutes','subnet_protection_enabled','auto_ban_enabled')").run(),
+      env.DB.prepare("SELECT key, value FROM site_settings WHERE key IN ('guestbook_locked','guestbook_lock_message','cooldown_enabled','cooldown_minutes','subnet_protection_enabled','auto_ban_enabled','under_construction_enabled','under_construction_title','under_construction_message','announcement_enabled','announcement_message','hide_navigation_enabled')").run(),
     ]);
 
     const settingsMap = new Map((settingsRows.results || []).map((row) => [row.key, row.value]));
@@ -123,6 +123,10 @@ export const onRequestGet = async ({ request, env }) => {
         cooldownMinutes: Number(settingsMap.get('cooldown_minutes') || 5),
         subnetProtectionEnabled: settingsMap.get('subnet_protection_enabled') !== '0',
         autoBanEnabled: settingsMap.get('auto_ban_enabled') !== '0',
+        underConstructionEnabled: settingsMap.get('under_construction_enabled') === '1',
+        underConstructionTitle: settingsMap.get('under_construction_title') || 'Under Construction',
+        announcementEnabled: settingsMap.get('announcement_enabled') === '1',
+        hideNavigationEnabled: settingsMap.get('hide_navigation_enabled') === '1',
       },
       environmentFlags: {
         hasAdminPassword: Boolean(env.ADMIN_PASSWORD),

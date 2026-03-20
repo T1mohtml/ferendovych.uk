@@ -1,11 +1,77 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Climbing from "./pages/Climbing.jsx";
 import Admin from "./pages/Admin.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
 import Navigation from "./components/Navigation.jsx";
 import Coding from "./pages/coding.jsx";
+
+function AppShell({ darkMode, toggleMode }) {
+  const location = useLocation();
+  const [siteStatus, setSiteStatus] = useState({
+    loaded: false,
+    underConstructionEnabled: false,
+    underConstructionTitle: 'Under Construction',
+    underConstructionMessage: 'This website is currently under construction. Please check back soon.',
+    announcementEnabled: false,
+    announcementMessage: '',
+    hideNavigationEnabled: false,
+  });
+
+  useEffect(() => {
+    const loadStatus = async () => {
+      try {
+        const response = await fetch('/api/site-status');
+        const data = await response.json();
+        if (response.ok) {
+          setSiteStatus({ loaded: true, ...siteStatus, ...data });
+          return;
+        }
+      } catch {
+        // ignore
+      }
+
+      setSiteStatus((prev) => ({ ...prev, loaded: true }));
+    };
+
+    loadStatus();
+  }, []);
+
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  if (!siteStatus.loaded) {
+    return null;
+  }
+
+  if (!isAdminRoute && siteStatus.underConstructionEnabled) {
+    return (
+      <div style={styles.bannedOverlay}>
+        <div style={styles.bannedCard}>
+          <h1 style={styles.bannedTitle}>{siteStatus.underConstructionTitle || 'Under Construction'}</h1>
+          <p style={styles.bannedText}>{siteStatus.underConstructionMessage || 'This website is currently under construction. Please check back soon.'}</p>
+          <p style={styles.bannedText}>Admin panel remains available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {!isAdminRoute && siteStatus.announcementEnabled && siteStatus.announcementMessage && (
+        <div style={styles.announcementBar}>{siteStatus.announcementMessage}</div>
+      )}
+      {!siteStatus.hideNavigationEnabled && <Navigation />}
+      <ThemeToggle darkMode={darkMode} toggleMode={toggleMode} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/climbing" element={<Climbing />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/coding" element={<Coding darkMode={darkMode} />} />
+      </Routes>
+    </>
+  );
+}
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -66,14 +132,7 @@ function App() {
 
   return (
     <Router>
-      <Navigation />
-      <ThemeToggle darkMode={darkMode} toggleMode={toggleMode} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/climbing" element={<Climbing />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/coding" element={<Coding darkMode={darkMode} />} />
-      </Routes>
+      <AppShell darkMode={darkMode} toggleMode={toggleMode} />
     </Router>
   );
 }
@@ -106,5 +165,17 @@ const styles = {
   bannedText: {
     margin: '0.4rem 0',
     color: '#ddd',
+  },
+  announcementBar: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
+    width: '100%',
+    padding: '10px 14px',
+    textAlign: 'center',
+    color: '#fff',
+    background: 'linear-gradient(90deg, #5f35ff, #8a2be2)',
+    borderBottom: '1px solid rgba(255,255,255,0.25)',
+    fontWeight: 600,
   },
 };
