@@ -6,6 +6,7 @@ export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [namesList, setNamesList] = useState([]);
   const [bannedIps, setBannedIps] = useState([]);
+  const [bannedAsns, setBannedAsns] = useState([]);
   const [status, setStatus] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isChecking, setIsChecking] = useState(false);
@@ -13,12 +14,18 @@ export default function Admin() {
   const [banDurationValue, setBanDurationValue] = useState('7');
   const [banDurationUnit, setBanDurationUnit] = useState('days');
   const [manualIp, setManualIp] = useState('');
+  const [manualAsn, setManualAsn] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [nameSearch, setNameSearch] = useState('');
   const [sortDirection, setSortDirection] = useState('desc');
   const [deleteIpInput, setDeleteIpInput] = useState('');
   const [guestbookLocked, setGuestbookLocked] = useState(false);
   const [guestbookLockMessage, setGuestbookLockMessage] = useState('Guestbook is temporarily locked by admin.');
+  const [cooldownEnabled, setCooldownEnabled] = useState(true);
+  const [cooldownMinutes, setCooldownMinutes] = useState(5);
+  const [subnetProtectionEnabled, setSubnetProtectionEnabled] = useState(true);
+  const [autoBanEnabled, setAutoBanEnabled] = useState(true);
+  const [diagnostics, setDiagnostics] = useState(null);
 
   useEffect(() => {
     const storedKey = sessionStorage.getItem('adminKey');
@@ -33,7 +40,9 @@ export default function Admin() {
     await Promise.all([
       fetchNames(adminKey),
       fetchBannedIps(adminKey),
+      fetchBannedAsns(adminKey),
       fetchAdminSettings(adminKey),
+      fetchDiagnostics(adminKey),
     ]);
   };
 
@@ -69,6 +78,22 @@ export default function Admin() {
     }
   };
 
+  const fetchBannedAsns = async (adminKey = password) => {
+    try {
+      const response = await fetch('/api/get-banned-asns', {
+        headers: {
+          'Admin-Key': adminKey
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBannedAsns(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch banned ASNs:', error);
+    }
+  };
+
   const fetchAdminSettings = async (adminKey = password) => {
     try {
       const response = await fetch('/api/admin-settings', {
@@ -81,9 +106,29 @@ export default function Admin() {
         const data = await response.json();
         setGuestbookLocked(Boolean(data.guestbook_locked));
         setGuestbookLockMessage(data.guestbook_lock_message || 'Guestbook is temporarily locked by admin.');
+        setCooldownEnabled(data.cooldown_enabled !== false);
+        setCooldownMinutes(Number(data.cooldown_minutes || 5));
+        setSubnetProtectionEnabled(data.subnet_protection_enabled !== false);
+        setAutoBanEnabled(data.auto_ban_enabled !== false);
       }
     } catch (error) {
       console.error('Failed to fetch admin settings:', error);
+    }
+  };
+
+  const fetchDiagnostics = async (adminKey = password) => {
+    try {
+      const response = await fetch('/api/admin-diagnostics', {
+        headers: {
+          'Admin-Key': adminKey
+        }
+      });
+
+      if (response.ok) {
+        setDiagnostics(await response.json());
+      }
+    } catch (error) {
+      console.error('Failed to fetch diagnostics:', error);
     }
   };
 
@@ -120,6 +165,7 @@ export default function Admin() {
     setIsAuthenticated(false);
     setLoginError('');
     setBannedIps([]);
+    setBannedAsns([]);
   };
 
   const handleBan = async (ip) => {
@@ -201,6 +247,86 @@ export default function Admin() {
     }
 
     handleBan(ip);
+  };
+
+  const handleBanAsn = async (asn) => {
+    const normalizedAsn = String(asn || '').trim().toUpperCase();
+    if (!normalizedAsn) return;
+    if (!confirm(`Ban/extend ASN ${normalizedAsn}?`)) return;
+
+    if (banDurationUnit !== 'permanent') {
+      const durationNumber = Number(banDurationValue);
+      if (!Number.isFinite(durationNumber) || durationNumber <= 0) {
+        setStatus('Please set a valid ban duration.');
+        return;
+      }
+    }
+
+    try {
+      const response = await fetch('/api/ban-asn', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Admin-Key': password,
+        },
+        body: JSON.stringify({
+          asn: normalizedAsn,
+          reason: banReason,
+          durationValue: banDurationUnit === 'permanent' ? null : Number(banDurationValue),
+          durationUnit: banDurationUnit,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setStatus(data.message || `ASN ${normalizedAsn} updated.`);
+        setManualAsn('');
+        fetchBannedAsns(password);
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setStatus('Network error banning ASN');
+    }
+  };
+
+  const handleUnbanAsn = async (asn) => {
+    const normalizedAsn = String(asn || '').trim().toUpperCase();
+    if (!normalizedAsn) return;
+    if (!confirm(`Unban ASN ${normalizedAsn}?`)) return;
+
+    try {
+      const response = await fetch('/api/unban-asn', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Admin-Key': password,
+        },
+        body: JSON.stringify({ asn: normalizedAsn }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setStatus(data.message || `ASN ${normalizedAsn} unbanned.`);
+        setBannedAsns((prev) => prev.filter((item) => item.asn !== normalizedAsn));
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setStatus('Network error unbanning ASN');
+    }
+  };
+
+  const handleManualAsnBan = () => {
+    const asn = manualAsn.trim();
+    if (!asn) {
+      setStatus('Type an ASN first.');
+      return;
+    }
+
+    handleBanAsn(asn);
   };
 
   const handleDelete = async (id) => {
@@ -299,6 +425,10 @@ export default function Admin() {
         body: JSON.stringify({
           guestbookLocked,
           guestbookLockMessage,
+          cooldownEnabled,
+          cooldownMinutes: Number(cooldownMinutes),
+          subnetProtectionEnabled,
+          autoBanEnabled,
         })
       });
 
@@ -306,6 +436,10 @@ export default function Admin() {
       if (response.ok) {
         setGuestbookLocked(Boolean(data.guestbook_locked));
         setGuestbookLockMessage(data.guestbook_lock_message || guestbookLockMessage);
+        setCooldownEnabled(data.cooldown_enabled !== false);
+        setCooldownMinutes(Number(data.cooldown_minutes || 5));
+        setSubnetProtectionEnabled(data.subnet_protection_enabled !== false);
+        setAutoBanEnabled(data.auto_ban_enabled !== false);
         setStatus('Website settings saved.');
         setTimeout(() => setStatus(''), 3000);
       } else {
@@ -348,9 +482,10 @@ export default function Admin() {
       totalNames: namesList.length,
       uniqueIps: uniqueIps.size,
       activeBans: bannedIps.length,
+      activeAsnBans: bannedAsns.length,
       guestbookStatus: guestbookLocked ? 'Locked' : 'Open',
     };
-  }, [namesList, bannedIps, guestbookLocked]);
+  }, [namesList, bannedIps, bannedAsns, guestbookLocked]);
 
   const formatBanExpiry = (expiresAt) => {
     if (!expiresAt) return 'Permanent';
@@ -416,6 +551,7 @@ export default function Admin() {
               <div style={styles.statCard}><strong>Total names:</strong><br />{stats.totalNames}</div>
               <div style={styles.statCard}><strong>Unique IPs:</strong><br />{stats.uniqueIps}</div>
               <div style={styles.statCard}><strong>Active bans:</strong><br />{stats.activeBans}</div>
+              <div style={styles.statCard}><strong>ASN bans:</strong><br />{stats.activeAsnBans}</div>
               <div style={styles.statCard}><strong>Guestbook:</strong><br />{stats.guestbookStatus}</div>
             </div>
           </div>
@@ -490,6 +626,14 @@ export default function Admin() {
                           Ban IP
                         </button>
                       )}
+                      {entry.asn && entry.asn !== 'Unknown ASN' && (
+                        <button
+                          onClick={() => handleBanAsn(entry.asn)}
+                          style={styles.banBtn}
+                        >
+                          Ban ASN
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDelete(entry.id)}
                         style={styles.deleteBtn}
@@ -553,6 +697,19 @@ export default function Admin() {
                   Ban / Extend IP
                 </button>
               </div>
+
+              <div style={styles.manualActionRow}>
+                <input
+                  type="text"
+                  value={manualAsn}
+                  onChange={(e) => setManualAsn(e.target.value)}
+                  placeholder="Type ASN manually (e.g. AS13335)"
+                  style={styles.configInput}
+                />
+                <button onClick={handleManualAsnBan} style={styles.banBtn}>
+                  Ban / Extend ASN
+                </button>
+              </div>
             </div>
 
             <div style={{ marginTop: '1rem' }}>
@@ -580,6 +737,32 @@ export default function Admin() {
                 </ul>
               )}
             </div>
+
+            <div style={{ marginTop: '1rem' }}>
+              <h3 style={styles.sectionHeading}>Active ASN Bans</h3>
+              {bannedAsns.length === 0 ? (
+                <p style={{ color: '#aaa', margin: 0 }}>No active ASN bans.</p>
+              ) : (
+                <ul style={styles.list}>
+                  {bannedAsns.map((ban) => (
+                    <li key={ban.id} style={styles.listItem}>
+                      <div>
+                        <span style={styles.listName}>{ban.asn}</span>
+                        <div style={styles.detailsContainer}>
+                          <span style={styles.detailItem}><strong>Reason:</strong> {ban.reason || 'No reason provided'}</span>
+                          <span style={styles.detailItem}><strong>Expires:</strong> {formatBanExpiry(ban.expires_at)}</span>
+                          <span style={styles.detailItem}><strong>Banned at:</strong> {new Date(ban.created_at).toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div style={styles.actionGroup}>
+                        <button onClick={() => handleBanAsn(ban.asn)} style={styles.banBtn}>Extend</button>
+                        <button onClick={() => handleUnbanAsn(ban.asn)} style={styles.unbanBtn}>Unban</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </>
         )}
 
@@ -600,7 +783,73 @@ export default function Admin() {
               placeholder="Message shown while guestbook is locked"
               style={styles.textArea}
             />
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={cooldownEnabled}
+                onChange={(e) => setCooldownEnabled(e.target.checked)}
+              />
+              Enable posting cooldown
+            </label>
+            <div style={styles.controlRow}>
+              <input
+                type="number"
+                min="1"
+                value={cooldownMinutes}
+                onChange={(e) => setCooldownMinutes(e.target.value)}
+                style={{ ...styles.configInput, maxWidth: '180px' }}
+                disabled={!cooldownEnabled}
+              />
+              <span style={{ color: '#bbb', alignSelf: 'center' }}>minutes between posts</span>
+            </div>
+
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={subnetProtectionEnabled}
+                onChange={(e) => setSubnetProtectionEnabled(e.target.checked)}
+              />
+              Enable subnet flood protection
+            </label>
+
+            <label style={styles.checkboxRow}>
+              <input
+                type="checkbox"
+                checked={autoBanEnabled}
+                onChange={(e) => setAutoBanEnabled(e.target.checked)}
+              />
+              Enable auto-ban from abuse scoring
+            </label>
+
             <button onClick={handleSaveWebsiteSettings} style={styles.button}>Save Website Settings</button>
+
+            <div style={{ marginTop: '1rem' }}>
+              <h3 style={styles.sectionHeading}>Server Diagnostics</h3>
+              <div style={styles.controlRow}>
+                <button onClick={() => fetchDiagnostics(password)} style={styles.secondaryBtn}>Refresh Diagnostics</button>
+              </div>
+              {diagnostics ? (
+                <div style={styles.detailsContainer}>
+                  <span style={styles.detailItem}><strong>Server time:</strong> {diagnostics.serverTime}</span>
+                  <span style={styles.detailItem}><strong>Platform:</strong> {diagnostics.runtime?.platform}</span>
+                  <span style={styles.detailItem}><strong>D1 connected:</strong> {String(diagnostics.runtime?.hasD1)}</span>
+                  <span style={styles.detailItem}><strong>IP:</strong> {diagnostics.requestContext?.ip || 'n/a'}</span>
+                  <span style={styles.detailItem}><strong>Country/City:</strong> {diagnostics.requestContext?.country || 'n/a'} / {diagnostics.requestContext?.city || 'n/a'}</span>
+                  <span style={styles.detailItem}><strong>ASN:</strong> {diagnostics.requestContext?.asn || 'n/a'}</span>
+                  <span style={styles.detailItem}><strong>Colo:</strong> {diagnostics.requestContext?.colo || 'n/a'}</span>
+                  <span style={styles.detailItem}><strong>TLS/HTTP:</strong> {diagnostics.requestContext?.tlsVersion || 'n/a'} / {diagnostics.requestContext?.httpProtocol || 'n/a'}</span>
+                  <span style={styles.detailItem}><strong>Total names:</strong> {diagnostics.securityStats?.namesCount ?? 0}</span>
+                  <span style={styles.detailItem}><strong>Active IP bans:</strong> {diagnostics.securityStats?.activeIpBans ?? 0}</span>
+                  <span style={styles.detailItem}><strong>Active ASN bans:</strong> {diagnostics.securityStats?.activeAsnBans ?? 0}</span>
+                  <span style={styles.detailItem}><strong>High-risk IPs:</strong> {diagnostics.securityStats?.highRiskIps ?? 0}</span>
+                  <span style={styles.detailItem}><strong>Has ADMIN_PASSWORD:</strong> {String(diagnostics.environmentFlags?.hasAdminPassword)}</span>
+                  <span style={styles.detailItem}><strong>Has TURNSTILE key:</strong> {String(diagnostics.environmentFlags?.hasTurnstileSecret)}</span>
+                  <span style={styles.detailItem}><strong>Has Discord webhook:</strong> {String(diagnostics.environmentFlags?.hasDiscordWebhook)}</span>
+                </div>
+              ) : (
+                <p style={{ color: '#aaa', marginTop: '0.6rem' }}>No diagnostics loaded yet.</p>
+              )}
+            </div>
           </div>
         )}
       </motion.div>

@@ -20,13 +20,30 @@ const upsertSetting = async (env, key, value) => {
 
 const getSettings = async (env) => {
   const { results } = await env.DB.prepare(
-    `SELECT key, value FROM site_settings WHERE key IN ('guestbook_locked', 'guestbook_lock_message')`
+    `SELECT key, value FROM site_settings WHERE key IN (
+      'guestbook_locked',
+      'guestbook_lock_message',
+      'cooldown_enabled',
+      'cooldown_minutes',
+      'subnet_protection_enabled',
+      'auto_ban_enabled'
+    )`
   ).run();
 
   const map = new Map((results || []).map((row) => [row.key, row.value]));
+
+  const cooldownMinutesRaw = Number(map.get('cooldown_minutes'));
+  const cooldownMinutes = Number.isFinite(cooldownMinutesRaw) && cooldownMinutesRaw > 0
+    ? cooldownMinutesRaw
+    : 5;
+
   return {
     guestbook_locked: map.get('guestbook_locked') === '1',
     guestbook_lock_message: map.get('guestbook_lock_message') || 'Guestbook is temporarily locked by admin.',
+    cooldown_enabled: map.get('cooldown_enabled') !== '0',
+    cooldown_minutes: cooldownMinutes,
+    subnet_protection_enabled: map.get('subnet_protection_enabled') !== '0',
+    auto_ban_enabled: map.get('auto_ban_enabled') !== '0',
   };
 };
 
@@ -73,14 +90,27 @@ export const onRequestPost = async ({ request, env }) => {
     const body = await request.json();
     const guestbookLocked = Boolean(body?.guestbookLocked);
     const guestbookLockMessage = String(body?.guestbookLockMessage || 'Guestbook is temporarily locked by admin.').trim();
+    const cooldownEnabled = body?.cooldownEnabled !== false;
+    const cooldownMinutesRaw = Number(body?.cooldownMinutes);
+    const cooldownMinutes = Number.isFinite(cooldownMinutesRaw) && cooldownMinutesRaw > 0 ? cooldownMinutesRaw : 5;
+    const subnetProtectionEnabled = body?.subnetProtectionEnabled !== false;
+    const autoBanEnabled = body?.autoBanEnabled !== false;
 
     await upsertSetting(env, 'guestbook_locked', guestbookLocked ? '1' : '0');
     await upsertSetting(env, 'guestbook_lock_message', guestbookLockMessage);
+    await upsertSetting(env, 'cooldown_enabled', cooldownEnabled ? '1' : '0');
+    await upsertSetting(env, 'cooldown_minutes', String(cooldownMinutes));
+    await upsertSetting(env, 'subnet_protection_enabled', subnetProtectionEnabled ? '1' : '0');
+    await upsertSetting(env, 'auto_ban_enabled', autoBanEnabled ? '1' : '0');
 
     return new Response(JSON.stringify({
       message: 'Settings saved.',
       guestbook_locked: guestbookLocked,
       guestbook_lock_message: guestbookLockMessage,
+      cooldown_enabled: cooldownEnabled,
+      cooldown_minutes: cooldownMinutes,
+      subnet_protection_enabled: subnetProtectionEnabled,
+      auto_ban_enabled: autoBanEnabled,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

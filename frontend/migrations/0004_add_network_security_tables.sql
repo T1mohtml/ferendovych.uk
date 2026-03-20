@@ -1,0 +1,20 @@
+-- Adds ASN bans and anti-abuse scoring/rate-limit tables.
+CREATE TABLE IF NOT EXISTS banned_asns (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  asn TEXT NOT NULL UNIQUE,
+  reason TEXT,
+  expires_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS abuse_scores (
+  ip_address TEXT PRIMARY KEY,
+  score INTEGER NOT NULL DEFAULT 0,
+  last_event TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS subnet_rate_limits (
+  subnet_key TEXT PRIMARY KEY,
+  hit_count INTEGER NOT NULL DEFAULT 0,
+  window_start TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
