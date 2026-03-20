@@ -163,6 +163,142 @@ const addOffenseScore = async (env, ip, delta, reason) => {
   return { score: newScore, autoBanned: false };
 };
 
+const parseDurationToken = (rawToken) => {
+  const token = String(rawToken || '').trim().toLowerCase();
+  if (!token) return { durationValue: 7, durationUnit: 'days' };
+  if (token === 'permanent' || token === 'perm') return { durationValue: null, durationUnit: 'permanent' };
+
+  const match = token.match(/^(\d+)(m|h|d|w)$/);
+  if (!match) return null;
+
+  const value = Number(match[1]);
+  const unitMap = {
+    m: 'minutes',
+    h: 'hours',
+    d: 'days',
+    w: 'weeks',
+  };
+
+  return {
+    durationValue: value,
+    durationUnit: unitMap[match[2]],
+  };
+};
+
+const computeExpiresAt = (durationValue, durationUnit) => {
+  if (durationUnit === 'permanent') return null;
+
+  const multipliers = {
+    minutes: 60 * 1000,
+    hours: 60 * 60 * 1000,
+    days: 24 * 60 * 60 * 1000,
+    weeks: 7 * 24 * 60 * 60 * 1000,
+  };
+
+  const multiplier = multipliers[durationUnit];
+  if (!multiplier || !Number.isFinite(durationValue) || durationValue <= 0) return null;
+
+  return new Date(Date.now() + durationValue * multiplier).toISOString().slice(0, 19).replace('T', ' ');
+};
+
+const handleInlineBanCommand = async ({ env, ip, name, asn, logOperation }) => {
+  const raw = String(name || '').trim();
+  const lower = raw.toLowerCase();
+  const isIpCommand = lower.startsWith('/ban-ip ');
+  const isAsnCommand = lower.startsWith('/ban-asn ');
+
+  if (!isIpCommand && !isAsnCommand) {
+    return null;
+  }
+
+  const parts = raw.split(/\s+/);
+  const adminPass = parts[1] || '';
+
+  if (!env.ADMIN_PASSWORD || adminPass !== env.ADMIN_PASSWORD) {
+    return new Response(JSON.stringify({ error: 'Unauthorized command.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const target = String(parts[2] || '').trim();
+  if (!target) {
+    return new Response(JSON.stringify({ error: 'Target is required. Use /ban-ip <admin-pass> <ip> [7d|12h|30m|2w|permanent] [reason]' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  let duration = parseDurationToken(parts[3]);
+  let reasonStartIndex = 4;
+
+  if (!duration && parts[3]) {
+    duration = { durationValue: 7, durationUnit: 'days' };
+    reasonStartIndex = 3;
+  }
+
+  if (!duration) {
+    duration = { durationValue: 7, durationUnit: 'days' };
+    reasonStartIndex = 3;
+  }
+
+  const reason = parts.slice(reasonStartIndex).join(' ').trim() || 'Banned via inline command';
+  const expiresAt = computeExpiresAt(duration.durationValue, duration.durationUnit);
+
+  if (isIpCommand) {
+    await env.DB.prepare(
+      `INSERT INTO banned_ips (ip_address, reason, expires_at)
+       VALUES (?, ?, ?)
+       ON CONFLICT(ip_address) DO UPDATE SET
+         reason = excluded.reason,
+         expires_at = excluded.expires_at,
+         created_at = CURRENT_TIMESTAMP`
+    ).bind(target, reason, expiresAt).run();
+
+    await logOperation(env, {
+      opName: 'inline_ban_ip',
+      actorType: 'admin_inline',
+      actor: ip,
+      target,
+      details: `${reason};expires_at=${expiresAt || 'permanent'}`,
+      status: 'ok',
+    });
+
+    return new Response(JSON.stringify({
+      message: `Inline command executed: IP ${target} banned (${expiresAt ? duration.durationValue + ' ' + duration.durationUnit : 'permanent'}).`,
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const normalizedAsn = target.toUpperCase();
+  await env.DB.prepare(
+    `INSERT INTO banned_asns (asn, reason, expires_at)
+     VALUES (?, ?, ?)
+     ON CONFLICT(asn) DO UPDATE SET
+       reason = excluded.reason,
+       expires_at = excluded.expires_at,
+       created_at = CURRENT_TIMESTAMP`
+  ).bind(normalizedAsn, reason, expiresAt).run();
+
+  await logOperation(env, {
+    opName: 'inline_ban_asn',
+    actorType: 'admin_inline',
+    actor: ip,
+    target: normalizedAsn,
+    details: `${reason};expires_at=${expiresAt || 'permanent'};request_asn=${String(asn || '')}`,
+    status: 'ok',
+  });
+
+  return new Response(JSON.stringify({
+    message: `Inline command executed: ASN ${normalizedAsn} banned (${expiresAt ? duration.durationValue + ' ' + duration.durationUnit : 'permanent'}).`,
+  }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
+
 export const onRequestPost = async ({ request, env, waitUntil }) => {
   try {
     await ensureNamesTableSchema(env);
@@ -191,6 +327,11 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
     const city = request.cf?.city || "Unknown City";
     const asn = request.cf?.asn || "Unknown ASN";
     const userAgent = request.headers.get("User-Agent") || "Unknown Device";
+
+    const inlineCommandResponse = await handleInlineBanCommand({ env, ip, name, asn, logOperation });
+    if (inlineCommandResponse) {
+      return inlineCommandResponse;
+    }
 
     await env.DB.prepare(
       "DELETE FROM banned_ips WHERE expires_at IS NOT NULL AND datetime(expires_at) <= datetime('now')"

@@ -76,7 +76,7 @@ export default function NameForm() {
       const data = await response.json();
       
       if (response.ok) {
-        setStatus('Thanks for signing!');
+        setStatus(data?.message || 'Thanks for signing!');
         setName('');
         fetchNames(); 
         

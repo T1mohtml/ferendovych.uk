@@ -118,12 +118,19 @@ function App() {
   }, [darkMode]);
 
   useEffect(() => {
+    let cancelled = false;
+
     const checkBan = async () => {
       try {
-        const response = await fetch('/api/check-ban');
+        const response = await fetch(`/api/check-ban?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
         const data = await response.json();
 
-        if (!response.ok && response.status === 403 && data?.banned) {
+        if (!cancelled && !response.ok && response.status === 403 && data?.banned) {
           setBanState({
             loading: false,
             banned: true,
@@ -133,13 +140,35 @@ function App() {
           return;
         }
 
-        setBanState({ loading: false, banned: false, reason: '', expires_at: null });
+        if (!cancelled) {
+          setBanState({ loading: false, banned: false, reason: '', expires_at: null });
+        }
       } catch {
-        setBanState({ loading: false, banned: false, reason: '', expires_at: null });
+        if (!cancelled) {
+          setBanState({ loading: false, banned: false, reason: '', expires_at: null });
+        }
       }
     };
 
     checkBan();
+
+    const interval = setInterval(checkBan, 10000);
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        checkBan();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('focus', handleVisibilityOrFocus);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+    };
   }, []);
 
   const toggleMode = () => setDarkMode((prev) => !prev);
