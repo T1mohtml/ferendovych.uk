@@ -20,11 +20,18 @@ function AppShell({ darkMode, toggleMode }) {
   });
 
   useEffect(() => {
+    let cancelled = false;
+
     const loadStatus = async () => {
       try {
-        const response = await fetch('/api/site-status');
+        const response = await fetch(`/api/site-status?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
         const data = await response.json();
-        if (response.ok) {
+        if (!cancelled && response.ok) {
           setSiteStatus((prev) => ({ ...prev, ...data, loaded: true }));
           return;
         }
@@ -32,11 +39,19 @@ function AppShell({ darkMode, toggleMode }) {
         // ignore
       }
 
-      setSiteStatus((prev) => ({ ...prev, loaded: true }));
+      if (!cancelled) {
+        setSiteStatus((prev) => ({ ...prev, loaded: true }));
+      }
     };
 
     loadStatus();
-  }, []);
+    const interval = setInterval(loadStatus, 20000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [location.pathname]);
 
   const isAdminRoute = location.pathname.startsWith('/admin');
 

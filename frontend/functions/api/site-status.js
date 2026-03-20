@@ -50,7 +50,10 @@ export const onRequestGet = async ({ env }) => {
       hideNavigationEnabled: map.get('hide_navigation_enabled') === '1',
     }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
