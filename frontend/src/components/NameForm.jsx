@@ -8,6 +8,7 @@ export default function NameForm() {
   const [namesList, setNamesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [turnstileToken, setTurnstileToken] = useState(null);
+  const [website, setWebsite] = useState('');
   const [isGuestbookLocked, setIsGuestbookLocked] = useState(false);
   const [guestbookLockMessage, setGuestbookLockMessage] = useState('Guestbook is temporarily locked by admin.');
 
@@ -70,7 +71,7 @@ export default function NameForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, token: turnstileToken }),
+        body: JSON.stringify({ name, token: turnstileToken, website }),
       });
 
       const data = await response.json();
@@ -78,6 +79,7 @@ export default function NameForm() {
       if (response.ok) {
         setStatus(data?.message || 'Thanks for signing!');
         setName('');
+        setWebsite('');
         fetchNames(); 
         
         // Clear success message after 3 seconds
@@ -118,6 +120,16 @@ export default function NameForm() {
         )}
         
         <form onSubmit={handleSubmit} style={styles.form}>
+          <input
+            type="text"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            autoComplete="off"
+            tabIndex={-1}
+            aria-hidden="true"
+            style={styles.honeypotInput}
+          />
+
           <div style={styles.inputGroup}>
             <input
               type="text"
@@ -254,6 +266,14 @@ const styles = {
     color: '#646cff',
     fontSize: '0.9rem',
     overflow: 'hidden',
+  },
+  honeypotInput: {
+    position: 'absolute',
+    left: '-9999px',
+    width: '1px',
+    height: '1px',
+    opacity: 0,
+    pointerEvents: 'none',
   },
   listContainer: {
     marginTop: '2rem',

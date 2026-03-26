@@ -1,3 +1,5 @@
+import { isAdminAuthorized } from './_admin-auth.js';
+
 export const onRequestGet = async ({ request, env }) => {
   try {
     await env.DB.prepare(
@@ -28,8 +30,7 @@ export const onRequestGet = async ({ request, env }) => {
       await env.DB.prepare(`ALTER TABLE names ADD COLUMN ${columnName} ${columnType}`).run();
     }
 
-    const adminKey = request.headers.get("Admin-Key");
-    const isAdmin = adminKey && adminKey === env.ADMIN_PASSWORD;
+    const isAdmin = await isAdminAuthorized(request, env);
 
     const query = isAdmin 
       ? "SELECT id, name, ip_address, country, city, user_agent, asn, created_at FROM names ORDER BY created_at DESC"

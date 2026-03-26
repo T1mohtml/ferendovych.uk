@@ -1,3 +1,5 @@
+import { requireAdminAuth } from './_admin-auth.js';
+
 export const onRequestGet = async ({ request, env }) => {
   try {
     await env.DB.prepare(
@@ -16,14 +18,8 @@ export const onRequestGet = async ({ request, env }) => {
       await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
     }
 
-    const adminKey = request.headers.get("Admin-Key");
-
-    if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    const unauthorizedResponse = await requireAdminAuth(request, env);
+    if (unauthorizedResponse) return unauthorizedResponse;
 
     await env.DB.prepare(
       "DELETE FROM banned_ips WHERE expires_at IS NOT NULL AND datetime(expires_at) <= datetime('now')"

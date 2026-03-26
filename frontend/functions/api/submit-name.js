@@ -193,7 +193,7 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
       await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
     }
 
-    const { name, token } = await request.json();
+    const { name, token, website } = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
     const country = request.headers.get("CF-IPCountry") || request.cf?.country || "Local";
     const city = request.cf?.city || "Unknown City";
@@ -291,6 +291,24 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
     const cooldownMinutes = Number.isFinite(cooldownMinutesRaw) && cooldownMinutesRaw > 0 ? cooldownMinutesRaw : 5;
     const subnetProtectionEnabled = settingsMap.get('subnet_protection_enabled') !== '0';
     const autoBanEnabled = settingsMap.get('auto_ban_enabled') !== '0';
+
+    if (String(website || '').trim()) {
+      if (autoBanEnabled) {
+        await addOffenseScore(env, ip, 3, 'honeypot triggered');
+      }
+      await logOperation(env, {
+        opName: 'submit_name',
+        actorType: 'visitor',
+        actor: ip,
+        target: name,
+        details: 'blocked_honeypot_triggered',
+        status: 'blocked',
+      });
+      return new Response(JSON.stringify({ error: 'Request blocked.' }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     if (guestbookLocked) {
       await logOperation(env, {

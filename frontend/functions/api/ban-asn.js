@@ -1,3 +1,5 @@
+import { requireAdminAuth } from './_admin-auth.js';
+
 const normalizeAsn = (input) => {
   const cleaned = String(input || '').trim().toUpperCase().replace(/^AS/, '');
   if (!/^\d{1,10}$/.test(cleaned)) return null;
@@ -35,10 +37,8 @@ export const onRequestPost = async ({ request, env }) => {
       await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN expires_at TIMESTAMP").run();
     }
 
-    const adminKey = request.headers.get("Admin-Key");
-    if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
-    }
+    const unauthorizedResponse = await requireAdminAuth(request, env);
+    if (unauthorizedResponse) return unauthorizedResponse;
 
     const payload = await request.json();
     const { asn, reason, durationValue, durationUnit } = payload || {};

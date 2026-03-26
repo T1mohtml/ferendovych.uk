@@ -1,3 +1,5 @@
+import { requireAdminAuth } from './_admin-auth.js';
+
 const isValidIPv4 = (ip) => {
   const parts = String(ip || '').trim().split('.');
   if (parts.length !== 4) return false;
@@ -46,11 +48,8 @@ export const onRequestPost = async ({ request, env }) => {
       await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
     }
 
-    const adminKey = request.headers.get("Admin-Key");
-    
-    if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
-    }
+    const unauthorizedResponse = await requireAdminAuth(request, env);
+    if (unauthorizedResponse) return unauthorizedResponse;
 
     const payload = await request.json();
     const { ip, reason, durationValue, durationUnit } = payload || {};

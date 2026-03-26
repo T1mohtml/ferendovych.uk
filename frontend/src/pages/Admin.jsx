@@ -36,12 +36,22 @@ export default function Admin() {
 
   useEffect(() => {
     const storedKey = sessionStorage.getItem('adminKey');
-    if (storedKey) {
+    const storedToken = sessionStorage.getItem('adminToken');
+    if (storedKey || storedToken) {
       setPassword(storedKey);
       setIsAuthenticated(true);
       refreshAll(storedKey);
     }
   }, []);
+
+  const getAuthHeaders = (adminKey = password, extraHeaders = {}) => {
+    const token = sessionStorage.getItem('adminToken');
+    return {
+      ...extraHeaders,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(adminKey ? { 'Admin-Key': adminKey } : {}),
+    };
+  };
 
   const refreshAll = async (adminKey = password) => {
     await Promise.all([
@@ -57,9 +67,7 @@ export default function Admin() {
   const fetchNames = async (adminKey = password) => {
     try {
       const response = await fetch('/api/get-names', {
-        headers: {
-          'Admin-Key': adminKey
-        }
+        headers: getAuthHeaders(adminKey)
       });
       if (response.ok) {
         const data = await response.json();
@@ -73,9 +81,7 @@ export default function Admin() {
   const fetchBannedIps = async (adminKey = password) => {
     try {
       const response = await fetch('/api/get-banned-ips', {
-        headers: {
-          'Admin-Key': adminKey
-        }
+        headers: getAuthHeaders(adminKey)
       });
       if (response.ok) {
         const data = await response.json();
@@ -89,9 +95,7 @@ export default function Admin() {
   const fetchBannedAsns = async (adminKey = password) => {
     try {
       const response = await fetch('/api/get-banned-asns', {
-        headers: {
-          'Admin-Key': adminKey
-        }
+        headers: getAuthHeaders(adminKey)
       });
       if (response.ok) {
         const data = await response.json();
@@ -105,9 +109,7 @@ export default function Admin() {
   const fetchAdminSettings = async (adminKey = password) => {
     try {
       const response = await fetch('/api/admin-settings', {
-        headers: {
-          'Admin-Key': adminKey
-        }
+        headers: getAuthHeaders(adminKey)
       });
 
       if (response.ok) {
@@ -133,9 +135,7 @@ export default function Admin() {
   const fetchDiagnostics = async (adminKey = password) => {
     try {
       const response = await fetch('/api/admin-diagnostics', {
-        headers: {
-          'Admin-Key': adminKey
-        }
+        headers: getAuthHeaders(adminKey)
       });
 
       if (response.ok) {
@@ -149,9 +149,7 @@ export default function Admin() {
   const fetchOperations = async (adminKey = password) => {
     try {
       const response = await fetch('/api/admin-operations', {
-        headers: {
-          'Admin-Key': adminKey
-        }
+        headers: getAuthHeaders(adminKey)
       });
 
       if (response.ok) {
@@ -175,7 +173,11 @@ export default function Admin() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         sessionStorage.setItem('adminKey', password);
+        if (data?.token) {
+          sessionStorage.setItem('adminToken', data.token);
+        }
         setIsAuthenticated(true);
         refreshAll(password);
       } else {
@@ -191,6 +193,7 @@ export default function Admin() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('adminKey');
+    sessionStorage.removeItem('adminToken');
     setPassword('');
     setIsAuthenticated(false);
     setLoginError('');
@@ -213,10 +216,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/ban-ip', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           ip,
           reason: banReason,
@@ -249,10 +249,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/unban-ip', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password,
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({ ip }),
       });
 
@@ -295,10 +292,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/ban-asn', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password,
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           asn: normalizedAsn,
           reason: banReason,
@@ -329,10 +323,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/unban-asn', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password,
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({ asn: normalizedAsn }),
       });
 
@@ -365,9 +356,7 @@ export default function Admin() {
     try {
       const response = await fetch(`/api/delete-name?id=${id}`, {
         method: 'DELETE',
-        headers: {
-          'Admin-Key': password
-        }
+        headers: getAuthHeaders(password)
       });
 
       if (response.ok) {
@@ -392,10 +381,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/delete-all-names', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password,
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
       });
 
       const data = await response.json();
@@ -423,10 +409,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/delete-names-by-ip', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password,
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({ ip }),
       });
 
@@ -448,10 +431,7 @@ export default function Admin() {
     try {
       const response = await fetch('/api/admin-settings', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Admin-Key': password,
-        },
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           guestbookLocked,
           guestbookLockMessage,
@@ -489,6 +469,49 @@ export default function Admin() {
       }
     } catch (error) {
       setStatus('Network error saving website settings');
+    }
+  };
+
+  const handleEmergencyLockdown = async () => {
+    if (!confirm('Enable emergency lockdown now? This will lock submissions and show an emergency announcement.')) return;
+
+    setGuestbookLocked(true);
+    setGuestbookLockMessage('Guestbook is temporarily locked due to high traffic. Please try again later.');
+    setUnderConstructionEnabled(true);
+    setUnderConstructionTitle('Maintenance in progress');
+    setUnderConstructionMessage('The website is temporarily restricted while we handle high traffic/security activity.');
+    setAnnouncementEnabled(true);
+    setAnnouncementMessage('⚠️ Temporary lockdown is active while we stabilize the website.');
+
+    try {
+      const response = await fetch('/api/admin-settings', {
+        method: 'POST',
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+          guestbookLocked: true,
+          guestbookLockMessage: 'Guestbook is temporarily locked due to high traffic. Please try again later.',
+          cooldownEnabled,
+          cooldownMinutes: Number(cooldownMinutes),
+          subnetProtectionEnabled,
+          autoBanEnabled,
+          underConstructionEnabled: true,
+          underConstructionTitle: 'Maintenance in progress',
+          underConstructionMessage: 'The website is temporarily restricted while we handle high traffic/security activity.',
+          announcementEnabled: true,
+          announcementMessage: '⚠️ Temporary lockdown is active while we stabilize the website.',
+          hideNavigationEnabled,
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setStatus('Emergency lockdown enabled.');
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        setStatus(`Error: ${data.error}`);
+      }
+    } catch {
+      setStatus('Network error while enabling emergency lockdown');
     }
   };
 
@@ -727,6 +750,14 @@ export default function Admin() {
                 </select>
               </div>
 
+              <div style={styles.controlRow}>
+                <button onClick={() => { setBanDurationValue('1'); setBanDurationUnit('hours'); }} style={styles.secondaryBtn}>1h</button>
+                <button onClick={() => { setBanDurationValue('24'); setBanDurationUnit('hours'); }} style={styles.secondaryBtn}>24h</button>
+                <button onClick={() => { setBanDurationValue('7'); setBanDurationUnit('days'); }} style={styles.secondaryBtn}>7d</button>
+                <button onClick={() => { setBanDurationValue('30'); setBanDurationUnit('days'); }} style={styles.secondaryBtn}>30d</button>
+                <button onClick={() => { setBanDurationValue(''); setBanDurationUnit('permanent'); }} style={styles.secondaryBtn}>Permanent</button>
+              </div>
+
               <div style={styles.manualActionRow}>
                 <input
                   type="text"
@@ -918,6 +949,7 @@ export default function Admin() {
             </label>
 
             <button onClick={handleSaveWebsiteSettings} style={styles.button}>Save Website Settings</button>
+            <button onClick={handleEmergencyLockdown} style={{ ...styles.button, marginTop: '0.6rem', background: '#cf3e3e' }}>Emergency Lockdown</button>
 
             <div style={{ marginTop: '1rem' }}>
               <h3 style={styles.sectionHeading}>Server Diagnostics</h3>

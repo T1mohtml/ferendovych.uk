@@ -1,3 +1,5 @@
+import { issueAdminToken } from './_admin-auth.js';
+
 export const onRequestPost = async ({ request, env }) => {
   try {
     const { password } = await request.json();
@@ -9,8 +11,9 @@ export const onRequestPost = async ({ request, env }) => {
           });
     }
 
-    if (password === env.ADMIN_PASSWORD) {
-       return new Response(JSON.stringify({ authenticated: true }), {
+     if (password === env.ADMIN_PASSWORD) {
+       const token = await issueAdminToken(env);
+       return new Response(JSON.stringify({ authenticated: true, token, expiresIn: 7200 }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });

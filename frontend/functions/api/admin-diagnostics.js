@@ -1,3 +1,5 @@
+import { requireAdminAuth } from './_admin-auth.js';
+
 const ensureBaseTables = async (env) => {
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS names (
@@ -80,13 +82,8 @@ const fetchSingleNumber = async (env, query) => {
 
 export const onRequestGet = async ({ request, env }) => {
   try {
-    const adminKey = request.headers.get('Admin-Key');
-    if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const unauthorizedResponse = await requireAdminAuth(request, env);
+    if (unauthorizedResponse) return unauthorizedResponse;
 
     await ensureBaseTables(env);
 

@@ -1,3 +1,5 @@
+import { requireAdminAuth } from './_admin-auth.js';
+
 const normalizeAsn = (input) => {
   const cleaned = String(input || '').trim().toUpperCase().replace(/^AS/, '');
   if (!/^\d{1,10}$/.test(cleaned)) return null;
@@ -29,13 +31,8 @@ export const onRequestPost = async ({ request, env }) => {
       )`
     ).run();
 
-    const adminKey = request.headers.get("Admin-Key");
-    if (!env.ADMIN_PASSWORD || adminKey !== env.ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    const unauthorizedResponse = await requireAdminAuth(request, env);
+    if (unauthorizedResponse) return unauthorizedResponse;
 
     const { asn } = await request.json();
     const normalizedAsn = normalizeAsn(asn);
