@@ -1,3 +1,20 @@
+const isValidIPv4 = (ip) => {
+  const parts = String(ip || '').trim().split('.');
+  if (parts.length !== 4) return false;
+  return parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) >= 0 && Number(part) <= 255);
+};
+
+const isValidIPv6 = (ip) => {
+  const value = String(ip || '').trim();
+  if (!value.includes(':')) return false;
+  if (!/^[0-9a-fA-F:]+$/.test(value)) return false;
+  const pieces = value.split(':');
+  if (pieces.length < 3 || pieces.length > 8) return false;
+  return true;
+};
+
+const isValidIpAddress = (ip) => isValidIPv4(ip) || isValidIPv6(ip);
+
 export const onRequestPost = async ({ request, env }) => {
   try {
     await env.DB.prepare(
@@ -46,8 +63,16 @@ export const onRequestPost = async ({ request, env }) => {
       });
     }
 
+    const normalizedIp = String(ip).trim();
+    if (!isValidIpAddress(normalizedIp)) {
+      return new Response(JSON.stringify({ error: "Invalid IP address format" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const { success } = await env.DB.prepare("DELETE FROM banned_ips WHERE ip_address = ?")
-      .bind(String(ip).trim())
+      .bind(normalizedIp)
       .run();
 
     if (!success) {
@@ -57,7 +82,7 @@ export const onRequestPost = async ({ request, env }) => {
     await env.DB.prepare(
       `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
        VALUES (?, ?, ?, ?, ?, ?)`
-    ).bind('admin_unban_ip', 'admin', 'panel', String(ip).trim(), 'manual_unban', 'ok').run();
+    ).bind('admin_unban_ip', 'admin', 'panel', normalizedIp, 'manual_unban', 'ok').run();
 
     return new Response(JSON.stringify({ message: `IP ${ip} unbanned successfully` }), {
       status: 200,

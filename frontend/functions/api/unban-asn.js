@@ -1,3 +1,9 @@
+const normalizeAsn = (input) => {
+  const cleaned = String(input || '').trim().toUpperCase().replace(/^AS/, '');
+  if (!/^\d{1,10}$/.test(cleaned)) return null;
+  return `AS${cleaned}`;
+};
+
 export const onRequestPost = async ({ request, env }) => {
   try {
     await env.DB.prepare(
@@ -32,9 +38,9 @@ export const onRequestPost = async ({ request, env }) => {
     }
 
     const { asn } = await request.json();
-    const normalizedAsn = String(asn || '').trim().toUpperCase();
+    const normalizedAsn = normalizeAsn(asn);
     if (!normalizedAsn) {
-      return new Response(JSON.stringify({ error: "ASN is required" }), {
+      return new Response(JSON.stringify({ error: "Valid ASN is required (example: AS13335)" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });

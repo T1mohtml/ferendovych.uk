@@ -1,3 +1,20 @@
+const isValidIPv4 = (ip) => {
+  const parts = String(ip || '').trim().split('.');
+  if (parts.length !== 4) return false;
+  return parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) >= 0 && Number(part) <= 255);
+};
+
+const isValidIPv6 = (ip) => {
+  const value = String(ip || '').trim();
+  if (!value.includes(':')) return false;
+  if (!/^[0-9a-fA-F:]+$/.test(value)) return false;
+  const pieces = value.split(':');
+  if (pieces.length < 3 || pieces.length > 8) return false;
+  return true;
+};
+
+const isValidIpAddress = (ip) => isValidIPv4(ip) || isValidIPv6(ip);
+
 export const onRequestPost = async ({ request, env }) => {
   try {
     await env.DB.prepare(
@@ -35,7 +52,8 @@ export const onRequestPost = async ({ request, env }) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const { ip, reason, durationValue, durationUnit } = await request.json();
+    const payload = await request.json();
+    const { ip, reason, durationValue, durationUnit } = payload || {};
 
     if (!ip) {
       return new Response(JSON.stringify({ error: "IP address is required" }), { status: 400 });
@@ -44,6 +62,10 @@ export const onRequestPost = async ({ request, env }) => {
     const normalizedIp = String(ip).trim();
     if (!normalizedIp) {
       return new Response(JSON.stringify({ error: "IP address is required" }), { status: 400 });
+    }
+
+    if (!isValidIpAddress(normalizedIp)) {
+      return new Response(JSON.stringify({ error: "Invalid IP address format" }), { status: 400 });
     }
 
     const parsedDurationValue = Number(durationValue);
@@ -69,7 +91,7 @@ export const onRequestPost = async ({ request, env }) => {
       expiresAt = expires.toISOString().slice(0, 19).replace("T", " ");
     }
 
-    const finalReason = String(reason || "Banned from Admin panel").trim() || "Banned from Admin panel";
+    const finalReason = (String(reason || "Banned from Admin panel").trim() || "Banned from Admin panel").slice(0, 220);
 
     const { success } = await env.DB.prepare(
       `INSERT INTO banned_ips (ip_address, reason, expires_at)

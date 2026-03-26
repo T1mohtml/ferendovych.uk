@@ -926,23 +926,78 @@ export default function Admin() {
                 <button onClick={() => fetchOperations(password)} style={styles.secondaryBtn}>Refresh Operations</button>
               </div>
               {diagnostics ? (
-                <div style={styles.detailsContainer}>
-                  <span style={styles.detailItem}><strong>Server time:</strong> {diagnostics.serverTime}</span>
-                  <span style={styles.detailItem}><strong>Platform:</strong> {diagnostics.runtime?.platform}</span>
-                  <span style={styles.detailItem}><strong>D1 connected:</strong> {String(diagnostics.runtime?.hasD1)}</span>
-                  <span style={styles.detailItem}><strong>IP:</strong> {diagnostics.requestContext?.ip || 'n/a'}</span>
-                  <span style={styles.detailItem}><strong>Country/City:</strong> {diagnostics.requestContext?.country || 'n/a'} / {diagnostics.requestContext?.city || 'n/a'}</span>
-                  <span style={styles.detailItem}><strong>ASN:</strong> {diagnostics.requestContext?.asn || 'n/a'}</span>
-                  <span style={styles.detailItem}><strong>Colo:</strong> {diagnostics.requestContext?.colo || 'n/a'}</span>
-                  <span style={styles.detailItem}><strong>TLS/HTTP:</strong> {diagnostics.requestContext?.tlsVersion || 'n/a'} / {diagnostics.requestContext?.httpProtocol || 'n/a'}</span>
-                  <span style={styles.detailItem}><strong>Total names:</strong> {diagnostics.securityStats?.namesCount ?? 0}</span>
-                  <span style={styles.detailItem}><strong>Active IP bans:</strong> {diagnostics.securityStats?.activeIpBans ?? 0}</span>
-                  <span style={styles.detailItem}><strong>Active ASN bans:</strong> {diagnostics.securityStats?.activeAsnBans ?? 0}</span>
-                  <span style={styles.detailItem}><strong>High-risk IPs:</strong> {diagnostics.securityStats?.highRiskIps ?? 0}</span>
-                  <span style={styles.detailItem}><strong>Has ADMIN_PASSWORD:</strong> {String(diagnostics.environmentFlags?.hasAdminPassword)}</span>
-                  <span style={styles.detailItem}><strong>Has TURNSTILE key:</strong> {String(diagnostics.environmentFlags?.hasTurnstileSecret)}</span>
-                  <span style={styles.detailItem}><strong>Has Discord webhook:</strong> {String(diagnostics.environmentFlags?.hasDiscordWebhook)}</span>
-                </div>
+                <>
+                  <div style={styles.detailsContainer}>
+                    <span style={styles.detailItem}><strong>Server time:</strong> {diagnostics.serverTime}</span>
+                    <span style={styles.detailItem}><strong>Platform:</strong> {diagnostics.runtime?.platform}</span>
+                    <span style={styles.detailItem}><strong>D1 connected:</strong> {String(diagnostics.runtime?.hasD1)}</span>
+                    <span style={styles.detailItem}><strong>IP:</strong> {diagnostics.requestContext?.ip || 'n/a'}</span>
+                    <span style={styles.detailItem}><strong>Country/City:</strong> {diagnostics.requestContext?.country || 'n/a'} / {diagnostics.requestContext?.city || 'n/a'}</span>
+                    <span style={styles.detailItem}><strong>ASN:</strong> {diagnostics.requestContext?.asn || 'n/a'}</span>
+                    <span style={styles.detailItem}><strong>Colo:</strong> {diagnostics.requestContext?.colo || 'n/a'}</span>
+                    <span style={styles.detailItem}><strong>TLS/HTTP:</strong> {diagnostics.requestContext?.tlsVersion || 'n/a'} / {diagnostics.requestContext?.httpProtocol || 'n/a'}</span>
+                    <span style={styles.detailItem}><strong>Total names:</strong> {diagnostics.securityStats?.namesCount ?? 0}</span>
+                    <span style={styles.detailItem}><strong>Active IP bans:</strong> {diagnostics.securityStats?.activeIpBans ?? 0}</span>
+                    <span style={styles.detailItem}><strong>Active ASN bans:</strong> {diagnostics.securityStats?.activeAsnBans ?? 0}</span>
+                    <span style={styles.detailItem}><strong>High-risk IPs:</strong> {diagnostics.securityStats?.highRiskIps ?? 0}</span>
+                    <span style={styles.detailItem}><strong>Live users (5m):</strong> {diagnostics.traffic?.window?.liveUsers5m ?? 0}</span>
+                    <span style={styles.detailItem}><strong>Live users (15m):</strong> {diagnostics.traffic?.window?.liveUsers15m ?? 0}</span>
+                    <span style={styles.detailItem}><strong>Page views (5m):</strong> {diagnostics.traffic?.window?.pageViews5m ?? 0}</span>
+                    <span style={styles.detailItem}><strong>API requests (5m):</strong> {diagnostics.traffic?.window?.apiRequests5m ?? 0}</span>
+                    <span style={styles.detailItem}><strong>Has ADMIN_PASSWORD:</strong> {String(diagnostics.environmentFlags?.hasAdminPassword)}</span>
+                    <span style={styles.detailItem}><strong>Has TURNSTILE key:</strong> {String(diagnostics.environmentFlags?.hasTurnstileSecret)}</span>
+                    <span style={styles.detailItem}><strong>Has Discord webhook:</strong> {String(diagnostics.environmentFlags?.hasDiscordWebhook)}</span>
+                  </div>
+
+                  <div style={{ marginTop: '0.8rem' }}>
+                    <h4 style={{ margin: '0 0 0.4rem 0', color: '#ddd' }}>Top Paths (last 5 minutes)</h4>
+                    <div style={styles.detailsContainer}>
+                      {(diagnostics.traffic?.topPaths5m || []).map((item) => (
+                        <span key={item.path} style={styles.detailItem}>
+                          <strong>{item.path}:</strong> {item.hits}
+                        </span>
+                      ))}
+                      {(diagnostics.traffic?.topPaths5m || []).length === 0 && (
+                        <span style={styles.detailItem}>No traffic yet in the last 5 minutes.</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '0.8rem' }}>
+                    <h4 style={{ margin: '0 0 0.4rem 0', color: '#ddd' }}>Recent Visitors (last 15 minutes)</h4>
+                    <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                      <ul style={styles.list}>
+                        {(diagnostics.traffic?.recentVisitors15m || []).map((row, index) => (
+                          <li key={`${row.ip_address}-${row.last_seen}-${index}`} style={styles.listItem}>
+                            <div>
+                              <span style={styles.listName}>{row.ip_address || 'unknown'}</span>
+                              <div style={styles.detailsContainer}>
+                                <span style={styles.detailItem}><strong>Location:</strong> {row.city || 'n/a'}, {row.country || 'n/a'}</span>
+                                <span style={styles.detailItem}><strong>Hits (15m):</strong> {row.hits_15m}</span>
+                                <span style={styles.detailItem}><strong>Last seen:</strong> {new Date(row.last_seen).toLocaleString()}</span>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                        {(diagnostics.traffic?.recentVisitors15m || []).length === 0 && <p>No recent visitors detected.</p>}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '0.8rem' }}>
+                    <h4 style={{ margin: '0 0 0.4rem 0', color: '#ddd' }}>Countries (last 15 minutes)</h4>
+                    <div style={styles.detailsContainer}>
+                      {(diagnostics.traffic?.countries15m || []).map((row) => (
+                        <span key={row.country} style={styles.detailItem}>
+                          <strong>{row.country}:</strong> {row.hits}
+                        </span>
+                      ))}
+                      {(diagnostics.traffic?.countries15m || []).length === 0 && (
+                        <span style={styles.detailItem}>No country data yet.</span>
+                      )}
+                    </div>
+                  </div>
+                </>
               ) : (
                 <p style={{ color: '#aaa', marginTop: '0.6rem' }}>No diagnostics loaded yet.</p>
               )}

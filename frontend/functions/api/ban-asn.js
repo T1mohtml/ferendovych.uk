@@ -1,3 +1,9 @@
+const normalizeAsn = (input) => {
+  const cleaned = String(input || '').trim().toUpperCase().replace(/^AS/, '');
+  if (!/^\d{1,10}$/.test(cleaned)) return null;
+  return `AS${cleaned}`;
+};
+
 export const onRequestPost = async ({ request, env }) => {
   try {
     await env.DB.prepare(
@@ -34,11 +40,12 @@ export const onRequestPost = async ({ request, env }) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const { asn, reason, durationValue, durationUnit } = await request.json();
-    const normalizedAsn = String(asn || '').trim().toUpperCase();
+    const payload = await request.json();
+    const { asn, reason, durationValue, durationUnit } = payload || {};
+    const normalizedAsn = normalizeAsn(asn);
 
     if (!normalizedAsn) {
-      return new Response(JSON.stringify({ error: "ASN is required" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "Valid ASN is required (example: AS13335)" }), { status: 400 });
     }
 
     const parsedDurationValue = Number(durationValue);
@@ -61,7 +68,7 @@ export const onRequestPost = async ({ request, env }) => {
       expiresAt = expires.toISOString().slice(0, 19).replace("T", " ");
     }
 
-    const finalReason = String(reason || "Banned ASN from Admin panel").trim() || "Banned ASN from Admin panel";
+    const finalReason = (String(reason || "Banned ASN from Admin panel").trim() || "Banned ASN from Admin panel").slice(0, 220);
 
     const { success } = await env.DB.prepare(
       `INSERT INTO banned_asns (asn, reason, expires_at)
