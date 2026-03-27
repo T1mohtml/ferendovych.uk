@@ -2,8 +2,13 @@ import { requireAdminAuth } from './_admin-auth.js';
 
 const normalizeAsn = (input) => {
   const cleaned = String(input || '').trim().toUpperCase().replace(/^AS/, '');
-  if (!/^\d{1,10}$/.test(cleaned)) return null;
-  return `AS${cleaned}`;
+  if (!cleaned) return null;
+
+  const decimalMatch = cleaned.match(/^(\d+)\.0+$/);
+  const normalizedDigits = decimalMatch ? decimalMatch[1] : cleaned;
+
+  if (!/^\d{1,10}$/.test(normalizedDigits)) return null;
+  return `AS${normalizedDigits}`;
 };
 
 export const onRequestPost = async ({ request, env }) => {

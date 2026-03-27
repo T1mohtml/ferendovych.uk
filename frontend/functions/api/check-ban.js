@@ -42,7 +42,9 @@ export const onRequestGet = async ({ request, env }) => {
 
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
     const rawAsn = String(request.cf?.asn || "").trim().toUpperCase().replace(/^AS/, '');
-    const asn = rawAsn ? `AS${rawAsn}` : '';
+    const decimalMatch = rawAsn.match(/^(\d+)\.0+$/);
+    const normalizedDigits = decimalMatch ? decimalMatch[1] : rawAsn;
+    const asn = /^\d{1,10}$/.test(normalizedDigits) ? `AS${normalizedDigits}` : '';
 
     await env.DB.prepare(
       "DELETE FROM banned_ips WHERE expires_at IS NOT NULL AND datetime(expires_at) <= datetime('now')"

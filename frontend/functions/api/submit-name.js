@@ -170,8 +170,13 @@ const addOffenseScore = async (env, ip, delta, reason) => {
 
 const normalizeAsn = (rawAsn) => {
   const cleaned = String(rawAsn || '').trim().toUpperCase().replace(/^AS/, '');
-  if (!/^\d{1,10}$/.test(cleaned)) return null;
-  return `AS${cleaned}`;
+  if (!cleaned) return null;
+
+  const decimalMatch = cleaned.match(/^(\d+)\.0+$/);
+  const normalizedDigits = decimalMatch ? decimalMatch[1] : cleaned;
+
+  if (!/^\d{1,10}$/.test(normalizedDigits)) return null;
+  return `AS${normalizedDigits}`;
 };
 
 const isPrivilegedCommandInput = (rawName) => /^\/ban-(ip|asn)\b/i.test(String(rawName || '').trim());

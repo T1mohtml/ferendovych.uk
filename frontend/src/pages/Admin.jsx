@@ -54,6 +54,16 @@ export default function Admin() {
     };
   };
 
+  const normalizeAsnInput = (value) => {
+    const cleaned = String(value || '').trim().toUpperCase().replace(/^AS/, '');
+    if (!cleaned) return '';
+
+    const decimalMatch = cleaned.match(/^(\d+)\.0+$/);
+    const normalizedDigits = decimalMatch ? decimalMatch[1] : cleaned;
+    if (!/^\d{1,10}$/.test(normalizedDigits)) return '';
+    return `AS${normalizedDigits}`;
+  };
+
   const refreshAll = async (adminKey = password) => {
     await Promise.all([
       fetchNames(adminKey),
@@ -279,7 +289,7 @@ export default function Admin() {
   };
 
   const handleBanAsn = async (asn) => {
-    const normalizedAsn = String(asn || '').trim().toUpperCase();
+    const normalizedAsn = normalizeAsnInput(asn);
     if (!normalizedAsn) return;
     if (!confirm(`Ban/extend ASN ${normalizedAsn}?`)) return;
 
@@ -319,7 +329,7 @@ export default function Admin() {
   };
 
   const handleUnbanAsn = async (asn) => {
-    const normalizedAsn = String(asn || '').trim().toUpperCase();
+    const normalizedAsn = normalizeAsnInput(asn);
     if (!normalizedAsn) return;
     if (!confirm(`Unban ASN ${normalizedAsn}?`)) return;
 
@@ -344,9 +354,9 @@ export default function Admin() {
   };
 
   const handleManualAsnBan = () => {
-    const asn = manualAsn.trim();
+    const asn = normalizeAsnInput(manualAsn);
     if (!asn) {
-      setStatus('Type an ASN first.');
+      setStatus('Type a valid ASN first (e.g. AS13335 or 13335).');
       return;
     }
 
