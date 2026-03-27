@@ -56,6 +56,10 @@ const ensureSecurityTables = async (env) => {
   if (!asnColumnNames.has("expires_at")) {
     await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN expires_at TIMESTAMP").run();
   }
+  if (!asnColumnNames.has("ban_type")) {
+    await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN ban_type TEXT").run();
+    await env.DB.prepare("UPDATE banned_asns SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+  }
 
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS abuse_scores (
@@ -149,13 +153,14 @@ const addOffenseScore = async (env, ip, delta, reason) => {
       .replace('T', ' ');
 
     await env.DB.prepare(
-      `INSERT INTO banned_ips (ip_address, reason, expires_at)
-       VALUES (?, ?, ?)
+      `INSERT INTO banned_ips (ip_address, reason, expires_at, ban_type)
+       VALUES (?, ?, ?, ?)
        ON CONFLICT(ip_address) DO UPDATE SET
          reason = excluded.reason,
          expires_at = excluded.expires_at,
+         ban_type = excluded.ban_type,
          created_at = CURRENT_TIMESTAMP`
-    ).bind(normalizedIp, `Auto-ban: ${reason} (abuse score ${newScore})`, expiresAt).run();
+    ).bind(normalizedIp, `Auto-ban: ${reason} (abuse score ${newScore})`, expiresAt, 'full').run();
 
     return { score: newScore, autoBanned: true, expiresAt };
   }
@@ -192,6 +197,10 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
     if (!bannedColumnNames.has("expires_at")) {
       await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
     }
+    if (!bannedColumnNames.has("ban_type")) {
+      await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN ban_type TEXT").run();
+      await env.DB.prepare("UPDATE banned_ips SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+    }
 
     const { name, token, website } = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
@@ -223,7 +232,7 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
 
     // 0️⃣ Check Banned IPs
     const { results: banned } = await env.DB.prepare(
-      `SELECT ip_address, reason, expires_at
+      `SELECT ip_address, reason, expires_at, COALESCE(ban_type, 'full') AS ban_type
        FROM banned_ips
        WHERE ip_address = ?
        AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
@@ -237,19 +246,20 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
         actorType: 'visitor',
         actor: ip,
         target: name,
-        details: 'blocked_by_ip_ban',
+        details: `blocked_by_ip_ban;type=${activeBan.ban_type || 'full'}`,
         status: 'blocked',
       });
       return new Response(JSON.stringify({
-        error: "You are banned from this website.",
+        error: activeBan.ban_type === 'shadow' ? 'You are banned from submitting names.' : 'You are banned from this website.',
         reason: activeBan.reason || "No reason provided.",
         expires_at: activeBan.expires_at,
+        ban_type: activeBan.ban_type || 'full',
       }), { status: 403, headers: { "Content-Type": "application/json" } });
     }
 
     const asnDigitsOnly = asn.startsWith('AS') ? asn.slice(2) : asn;
     const { results: bannedAsns } = await env.DB.prepare(
-      `SELECT asn, reason, expires_at
+      `SELECT asn, reason, expires_at, COALESCE(ban_type, 'full') AS ban_type
        FROM banned_asns
        WHERE asn IN (?, ?)
        AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
@@ -263,13 +273,14 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
         actorType: 'visitor',
         actor: ip,
         target: String(asn),
-        details: 'blocked_by_asn_ban',
+        details: `blocked_by_asn_ban;type=${activeBan.ban_type || 'full'}`,
         status: 'blocked',
       });
       return new Response(JSON.stringify({
-        error: "Your network provider is banned from this website.",
+        error: activeBan.ban_type === 'shadow' ? 'Your network is banned from submitting names.' : 'Your network provider is banned from this website.',
         reason: activeBan.reason || "No reason provided.",
         expires_at: activeBan.expires_at,
+        ban_type: activeBan.ban_type || 'full',
       }), { status: 403, headers: { "Content-Type": "application/json" } });
     }
 

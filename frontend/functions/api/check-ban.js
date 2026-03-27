@@ -15,6 +15,10 @@ export const onRequestGet = async ({ request, env }) => {
     if (!bannedColumnNames.has("expires_at")) {
       await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
     }
+    if (!bannedColumnNames.has("ban_type")) {
+      await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN ban_type TEXT").run();
+      await env.DB.prepare("UPDATE banned_ips SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+    }
 
     await env.DB.prepare(
       `CREATE TABLE IF NOT EXISTS banned_asns (
@@ -31,9 +35,14 @@ export const onRequestGet = async ({ request, env }) => {
     if (!asnColumnNames.has("expires_at")) {
       await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN expires_at TIMESTAMP").run();
     }
+    if (!asnColumnNames.has("ban_type")) {
+      await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN ban_type TEXT").run();
+      await env.DB.prepare("UPDATE banned_asns SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+    }
 
     const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
-    const asn = String(request.cf?.asn || "").toUpperCase();
+    const rawAsn = String(request.cf?.asn || "").trim().toUpperCase().replace(/^AS/, '');
+    const asn = rawAsn ? `AS${rawAsn}` : '';
 
     await env.DB.prepare(
       "DELETE FROM banned_ips WHERE expires_at IS NOT NULL AND datetime(expires_at) <= datetime('now')"
@@ -43,9 +52,10 @@ export const onRequestGet = async ({ request, env }) => {
     ).run();
 
     const { results } = await env.DB.prepare(
-      `SELECT ip_address, reason, expires_at, created_at
+      `SELECT ip_address, reason, expires_at, created_at, COALESCE(ban_type, 'full') AS ban_type
        FROM banned_ips
        WHERE ip_address = ?
+       AND COALESCE(ban_type, 'full') = 'full'
        AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
        LIMIT 1`
     ).bind(ip).run();
@@ -58,6 +68,7 @@ export const onRequestGet = async ({ request, env }) => {
         reason: ban.reason || "You are banned.",
         expires_at: ban.expires_at,
         created_at: ban.created_at,
+        ban_type: ban.ban_type || 'full',
       }), {
         status: 403,
         headers: { "Content-Type": "application/json" },
@@ -65,13 +76,15 @@ export const onRequestGet = async ({ request, env }) => {
     }
 
     if (asn) {
+      const asnDigitsOnly = asn.slice(2);
       const { results: asnResults } = await env.DB.prepare(
-        `SELECT asn, reason, expires_at, created_at
+        `SELECT asn, reason, expires_at, created_at, COALESCE(ban_type, 'full') AS ban_type
          FROM banned_asns
-         WHERE asn = ?
+         WHERE asn IN (?, ?)
+         AND COALESCE(ban_type, 'full') = 'full'
          AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
          LIMIT 1`
-      ).bind(asn).run();
+      ).bind(asn, asnDigitsOnly).run();
 
       if (asnResults && asnResults.length > 0) {
         const ban = asnResults[0];
@@ -81,6 +94,7 @@ export const onRequestGet = async ({ request, env }) => {
           reason: ban.reason || "Your network provider is banned.",
           expires_at: ban.expires_at,
           created_at: ban.created_at,
+          ban_type: ban.ban_type || 'full',
         }), {
           status: 403,
           headers: { "Content-Type": "application/json" },

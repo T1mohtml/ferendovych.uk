@@ -17,6 +17,10 @@ export const onRequestGet = async ({ request, env }) => {
     if (!colNames.has("expires_at")) {
       await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN expires_at TIMESTAMP").run();
     }
+    if (!colNames.has("ban_type")) {
+      await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN ban_type TEXT").run();
+      await env.DB.prepare("UPDATE banned_asns SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+    }
 
     const unauthorizedResponse = await requireAdminAuth(request, env);
     if (unauthorizedResponse) return unauthorizedResponse;
@@ -26,7 +30,7 @@ export const onRequestGet = async ({ request, env }) => {
     ).run();
 
     const { results } = await env.DB.prepare(
-      `SELECT id, asn, reason, expires_at, created_at
+      `SELECT id, asn, reason, expires_at, created_at, COALESCE(ban_type, 'full') AS ban_type
        FROM banned_asns
        WHERE expires_at IS NULL OR datetime(expires_at) > datetime('now')
        ORDER BY created_at DESC`

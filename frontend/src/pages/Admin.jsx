@@ -13,6 +13,7 @@ export default function Admin() {
   const [banReason, setBanReason] = useState('Spam / bad language');
   const [banDurationValue, setBanDurationValue] = useState('7');
   const [banDurationUnit, setBanDurationUnit] = useState('days');
+  const [banType, setBanType] = useState('full');
   const [manualIp, setManualIp] = useState('');
   const [manualAsn, setManualAsn] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
@@ -222,6 +223,7 @@ export default function Admin() {
           reason: banReason,
           durationValue: banDurationUnit === 'permanent' ? null : Number(banDurationValue),
           durationUnit: banDurationUnit,
+          banType,
         })
       });
 
@@ -230,7 +232,7 @@ export default function Admin() {
           ? 'permanent'
           : `${banDurationValue} ${banDurationUnit}`;
 
-        setStatus(`IP ${ip} banned (${durationLabel})`);
+        setStatus(`IP ${ip} ${banType === 'shadow' ? 'shadow banned' : 'fully banned'} (${durationLabel})`);
         fetchBannedIps(password);
         setTimeout(() => setStatus(''), 3000);
       } else {
@@ -298,6 +300,7 @@ export default function Admin() {
           reason: banReason,
           durationValue: banDurationUnit === 'permanent' ? null : Number(banDurationValue),
           durationUnit: banDurationUnit,
+          banType,
         }),
       });
 
@@ -626,6 +629,55 @@ export default function Admin() {
           <>
             <div style={styles.sectionCard}>
               <h3 style={styles.sectionHeading}>Name Controls</h3>
+              <div style={styles.banConfigRow}>
+                <input
+                  type="text"
+                  value={banReason}
+                  onChange={(e) => setBanReason(e.target.value)}
+                  placeholder="Ban reason shown to user"
+                  style={styles.configInput}
+                />
+
+                <input
+                  type="number"
+                  min="1"
+                  value={banDurationUnit === 'permanent' ? '' : banDurationValue}
+                  onChange={(e) => setBanDurationValue(e.target.value)}
+                  placeholder="Duration"
+                  style={{ ...styles.configInput, maxWidth: '120px' }}
+                  disabled={banDurationUnit === 'permanent'}
+                />
+
+                <select
+                  value={banDurationUnit}
+                  onChange={(e) => setBanDurationUnit(e.target.value)}
+                  style={styles.configSelect}
+                >
+                  <option value="minutes">Minutes</option>
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                  <option value="weeks">Weeks</option>
+                  <option value="permanent">Permanent</option>
+                </select>
+
+                <select
+                  value={banType}
+                  onChange={(e) => setBanType(e.target.value)}
+                  style={styles.configSelect}
+                >
+                  <option value="full">Full ban (no access)</option>
+                  <option value="shadow">Shadow ban (no posting)</option>
+                </select>
+              </div>
+
+              <div style={styles.controlRow}>
+                <button onClick={() => { setBanDurationValue('1'); setBanDurationUnit('hours'); }} style={styles.secondaryBtn}>1h</button>
+                <button onClick={() => { setBanDurationValue('24'); setBanDurationUnit('hours'); }} style={styles.secondaryBtn}>24h</button>
+                <button onClick={() => { setBanDurationValue('7'); setBanDurationUnit('days'); }} style={styles.secondaryBtn}>7d</button>
+                <button onClick={() => { setBanDurationValue('30'); setBanDurationUnit('days'); }} style={styles.secondaryBtn}>30d</button>
+                <button onClick={() => { setBanDurationValue(''); setBanDurationUnit('permanent'); }} style={styles.secondaryBtn}>Permanent</button>
+              </div>
+
               <div style={styles.controlRow}>
                 <input
                   type="text"
@@ -748,6 +800,15 @@ export default function Admin() {
                   <option value="weeks">Weeks</option>
                   <option value="permanent">Permanent</option>
                 </select>
+
+                <select
+                  value={banType}
+                  onChange={(e) => setBanType(e.target.value)}
+                  style={styles.configSelect}
+                >
+                  <option value="full">Full ban (no access)</option>
+                  <option value="shadow">Shadow ban (no posting)</option>
+                </select>
               </div>
 
               <div style={styles.controlRow}>
@@ -796,6 +857,7 @@ export default function Admin() {
                       <div>
                         <span style={styles.listName}>{ban.ip_address}</span>
                         <div style={styles.detailsContainer}>
+                          <span style={styles.detailItem}><strong>Type:</strong> {ban.ban_type === 'shadow' ? 'Shadow (no posting)' : 'Full (no access)'}</span>
                           <span style={styles.detailItem}><strong>Reason:</strong> {ban.reason || 'No reason provided'}</span>
                           <span style={styles.detailItem}><strong>Expires:</strong> {formatBanExpiry(ban.expires_at)}</span>
                           <span style={styles.detailItem}><strong>Banned at:</strong> {new Date(ban.created_at).toLocaleString()}</span>
@@ -822,6 +884,7 @@ export default function Admin() {
                       <div>
                         <span style={styles.listName}>{ban.asn}</span>
                         <div style={styles.detailsContainer}>
+                          <span style={styles.detailItem}><strong>Type:</strong> {ban.ban_type === 'shadow' ? 'Shadow (no posting)' : 'Full (no access)'}</span>
                           <span style={styles.detailItem}><strong>Reason:</strong> {ban.reason || 'No reason provided'}</span>
                           <span style={styles.detailItem}><strong>Expires:</strong> {formatBanExpiry(ban.expires_at)}</span>
                           <span style={styles.detailItem}><strong>Banned at:</strong> {new Date(ban.created_at).toLocaleString()}</span>

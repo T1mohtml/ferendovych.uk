@@ -47,12 +47,16 @@ export const onRequestPost = async ({ request, env }) => {
     if (!bannedColumnNames.has("expires_at")) {
       await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN expires_at TIMESTAMP").run();
     }
+    if (!bannedColumnNames.has("ban_type")) {
+      await env.DB.prepare("ALTER TABLE banned_ips ADD COLUMN ban_type TEXT").run();
+      await env.DB.prepare("UPDATE banned_ips SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+    }
 
     const unauthorizedResponse = await requireAdminAuth(request, env);
     if (unauthorizedResponse) return unauthorizedResponse;
 
     const payload = await request.json();
-    const { ip, reason, durationValue, durationUnit } = payload || {};
+    const { ip, reason, durationValue, durationUnit, banType } = payload || {};
 
     if (!ip) {
       return new Response(JSON.stringify({ error: "IP address is required" }), { status: 400 });
@@ -70,6 +74,7 @@ export const onRequestPost = async ({ request, env }) => {
     const parsedDurationValue = Number(durationValue);
     const validUnits = ["minutes", "hours", "days", "weeks", "permanent"];
     const unit = validUnits.includes(durationUnit) ? durationUnit : "days";
+    const finalBanType = banType === 'shadow' ? 'shadow' : 'full';
 
     if (unit !== "permanent" && (!Number.isFinite(parsedDurationValue) || parsedDurationValue <= 0)) {
       return new Response(JSON.stringify({ error: "A valid duration is required" }), { status: 400 });
@@ -93,28 +98,30 @@ export const onRequestPost = async ({ request, env }) => {
     const finalReason = (String(reason || "Banned from Admin panel").trim() || "Banned from Admin panel").slice(0, 220);
 
     const { success } = await env.DB.prepare(
-      `INSERT INTO banned_ips (ip_address, reason, expires_at)
-       VALUES (?, ?, ?)
+      `INSERT INTO banned_ips (ip_address, reason, expires_at, ban_type)
+       VALUES (?, ?, ?, ?)
        ON CONFLICT(ip_address) DO UPDATE SET
          reason = excluded.reason,
          expires_at = excluded.expires_at,
+         ban_type = excluded.ban_type,
          created_at = CURRENT_TIMESTAMP`
     )
-      .bind(normalizedIp, finalReason, expiresAt)
+      .bind(normalizedIp, finalReason, expiresAt, finalBanType)
       .run();
 
     if (success) {
       await env.DB.prepare(
         `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
          VALUES (?, ?, ?, ?, ?, ?)`
-      ).bind('admin_ban_ip', 'admin', 'panel', normalizedIp, finalReason, 'ok').run();
+      ).bind('admin_ban_ip', 'admin', 'panel', normalizedIp, `${finalReason};type=${finalBanType}`, 'ok').run();
 
       return new Response(JSON.stringify({
-        message: `IP ${normalizedIp} banned successfully`,
+        message: `IP ${normalizedIp} ${finalBanType === 'shadow' ? 'shadow banned' : 'fully banned'} successfully`,
         ban: {
           ip: normalizedIp,
           reason: finalReason,
           expires_at: expiresAt,
+          ban_type: finalBanType,
         },
       }), { status: 200 });
     } else {

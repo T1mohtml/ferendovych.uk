@@ -36,13 +36,18 @@ export const onRequestPost = async ({ request, env }) => {
     if (!colNames.has("expires_at")) {
       await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN expires_at TIMESTAMP").run();
     }
+    if (!colNames.has("ban_type")) {
+      await env.DB.prepare("ALTER TABLE banned_asns ADD COLUMN ban_type TEXT").run();
+      await env.DB.prepare("UPDATE banned_asns SET ban_type = 'full' WHERE ban_type IS NULL OR trim(ban_type) = ''").run();
+    }
 
     const unauthorizedResponse = await requireAdminAuth(request, env);
     if (unauthorizedResponse) return unauthorizedResponse;
 
     const payload = await request.json();
-    const { asn, reason, durationValue, durationUnit } = payload || {};
+    const { asn, reason, durationValue, durationUnit, banType } = payload || {};
     const normalizedAsn = normalizeAsn(asn);
+    const finalBanType = banType === 'shadow' ? 'shadow' : 'full';
 
     if (!normalizedAsn) {
       return new Response(JSON.stringify({ error: "Valid ASN is required (example: AS13335)" }), { status: 400 });
@@ -71,13 +76,14 @@ export const onRequestPost = async ({ request, env }) => {
     const finalReason = (String(reason || "Banned ASN from Admin panel").trim() || "Banned ASN from Admin panel").slice(0, 220);
 
     const { success } = await env.DB.prepare(
-      `INSERT INTO banned_asns (asn, reason, expires_at)
-       VALUES (?, ?, ?)
+      `INSERT INTO banned_asns (asn, reason, expires_at, ban_type)
+       VALUES (?, ?, ?, ?)
        ON CONFLICT(asn) DO UPDATE SET
          reason = excluded.reason,
          expires_at = excluded.expires_at,
+         ban_type = excluded.ban_type,
          created_at = CURRENT_TIMESTAMP`
-    ).bind(normalizedAsn, finalReason, expiresAt).run();
+    ).bind(normalizedAsn, finalReason, expiresAt, finalBanType).run();
 
     if (!success) {
       throw new Error("Failed to ban ASN");
@@ -86,14 +92,15 @@ export const onRequestPost = async ({ request, env }) => {
     await env.DB.prepare(
       `INSERT INTO operations_log (op_name, actor_type, actor, target, details, status)
        VALUES (?, ?, ?, ?, ?, ?)`
-    ).bind('admin_ban_asn', 'admin', 'panel', normalizedAsn, finalReason, 'ok').run();
+    ).bind('admin_ban_asn', 'admin', 'panel', normalizedAsn, `${finalReason};type=${finalBanType}`, 'ok').run();
 
     return new Response(JSON.stringify({
-      message: `ASN ${normalizedAsn} banned successfully`,
+      message: `ASN ${normalizedAsn} ${finalBanType === 'shadow' ? 'shadow banned' : 'fully banned'} successfully`,
       ban: {
         asn: normalizedAsn,
         reason: finalReason,
         expires_at: expiresAt,
+        ban_type: finalBanType,
       },
     }), {
       status: 200,
