@@ -188,6 +188,11 @@ export default function Climbing() { // export stuff (idk what this does lol)
 
   return ( // return? mkay *goes home to sleep*
     <div ref={containerRef}> {/* dude why does this comment have to be in curly braces? */} {/* thats weaird */}
+      <style>{`
+        .adv-img-wrap img, .adv-img-wrap video { transition: transform 380ms cubic-bezier(0.25,0.46,0.45,0.94); }
+        .adv-img-wrap:hover img, .adv-img-wrap:hover video { transform: scale(1.06); }
+        .stat-card-glow:hover { box-shadow: 0 12px 40px rgba(124,58,237,0.28), 0 4px 16px rgba(0,0,0,0.15) !important; }
+      `}</style>
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -311,7 +316,7 @@ export default function Climbing() { // export stuff (idk what this does lol)
               >
                 {/* If a video is provided, render it; otherwise render the image */}
                 {adventure.video ? (
-                  <div style={styles.adventureImageWrapper}>
+                  <div style={styles.adventureImageWrapper} className="adv-img-wrap">
                     <AutoPlayVideo
                       src={adventure.video}
                       poster={adventure.poster || adventure.image || '/vite.svg'}
@@ -319,7 +324,7 @@ export default function Climbing() { // export stuff (idk what this does lol)
                     />
                   </div>
                 ) : (
-                  <div style={styles.adventureImageWrapper}>
+                  <div style={styles.adventureImageWrapper} className="adv-img-wrap">
                     <img
                       src={adventure.image || '/vite.svg'}
                       alt={adventure.title}
@@ -371,6 +376,7 @@ export default function Climbing() { // export stuff (idk what this does lol)
               <motion.div
                 key={stat.label}
                 style={styles.statCard}
+                className="stat-card-glow"
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: false, amount: 0.3 }}
@@ -458,12 +464,14 @@ const styles = {
     width: "100%",
     textAlign: "center",
     padding: "0 2rem 2rem 2rem",
-    paddingTop: "120px", // Extra space for navbar + buffer
+    paddingTop: "120px",
     margin: "0",
     marginTop: "0",
     position: "relative",
     overflow: "hidden",
-    background: "linear-gradient(135deg, rgba(100, 108, 255, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%)",
+    background: "linear-gradient(160deg, rgba(124,58,237,0.12) 0%, rgba(56,189,248,0.06) 50%, rgba(79,70,229,0.08) 100%)",
+    backgroundImage: "radial-gradient(circle at 1px 1px, rgba(124,58,237,0.1) 1px, transparent 0)",
+    backgroundSize: "44px 44px",
     boxSizing: "border-box",
   },
   heroContent: {
@@ -514,13 +522,13 @@ const styles = {
     marginBottom: "4rem",
   },
   adventureCard: {
-    backgroundColor: "rgba(124, 58, 237, 0.03)",
+    backgroundColor: "rgba(124, 58, 237, 0.04)",
     borderRadius: "20px",
     overflow: "hidden",
-    border: "1px solid rgba(124, 58, 237, 0.12)",
+    border: "1px solid rgba(124, 58, 237, 0.16)",
     cursor: "pointer",
     transition: "all 0.1s ease",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.05)",
   },
   adventureGrade: {
     background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
@@ -595,12 +603,13 @@ const styles = {
   },
   statCard: {
     textAlign: "center",
-    padding: "2rem 1rem",
-    borderRadius: "16px",
-    backgroundColor: "rgba(124, 58, 237, 0.05)",
-    border: "1px solid rgba(124, 58, 237, 0.14)",
+    padding: "2.5rem 1.5rem",
+    borderRadius: "20px",
+    backgroundColor: "rgba(124, 58, 237, 0.06)",
+    border: "1px solid rgba(124, 58, 237, 0.18)",
     cursor: "pointer",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.05)",
+    transition: "box-shadow 0.2s",
   },
   statIcon: {
     fontSize: "3rem",
