@@ -9,7 +9,8 @@ export default function Navigation({ topOffset = 0, darkMode = false }) {
   const navItems = [
     { path: "/", label: "Home", icon: "🏠" },
     { path: "/climbing", label: "Climbing", icon: "🧗‍♂️" },
-    { path: "/coding", label: "Coding", icon: "💻" }
+    { path: "/coding", label: "Coding", icon: "💻" },
+    { path: "/blog", label: "Blog", icon: "✍️" },
   ];
 
   return (
@@ -40,7 +41,15 @@ export default function Navigation({ topOffset = 0, darkMode = false }) {
             >
               <Link
                 to={item.path}
-                className={`nav-link ${location.pathname === item.path ? "active" : ""}`}
+                className={`nav-link ${
+                  item.path === "/"
+                    ? location.pathname === "/"
+                      ? "active"
+                      : ""
+                    : location.pathname.startsWith(item.path)
+                    ? "active"
+                    : ""
+                }`}
               >
                 <span className="nav-icon">{item.icon}</span>
                 {item.label}

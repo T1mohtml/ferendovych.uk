@@ -6,6 +6,8 @@ import Admin from "./pages/Admin.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
 import Navigation from "./components/Navigation.jsx";
 import Coding from "./pages/coding.jsx";
+import Blog from "./pages/Blog.jsx";
+import BlogPost from "./pages/BlogPost.jsx";
 
 function AppShell({ darkMode, toggleMode }) {
   const location = useLocation();
@@ -97,6 +99,8 @@ function AppShell({ darkMode, toggleMode }) {
         <Route path="/climbing" element={<Climbing />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/coding" element={<Coding darkMode={darkMode} />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
       </Routes>
     </>
   );

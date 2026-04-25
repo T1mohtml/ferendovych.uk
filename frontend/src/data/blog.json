@@ -1,0 +1,63 @@
+[
+  {
+    "id": "1",
+    "slug": "hello-world",
+    "title": "Hello World — My First Blog Post",
+    "date": "2026-04-20",
+    "tags": ["personal", "web dev"],
+    "excerpt": "Welcome to my blog! Here I'll write about coding, climbing, and whatever else is on my mind. This is where it all starts.",
+    "coverEmoji": "👋",
+    "content": [
+      { "type": "paragraph", "text": "Hey! Welcome to my blog. I've wanted to write one of these for a while, and I finally sat down and built it into my personal site. If you're reading this, hi! 👋" },
+      { "type": "paragraph", "text": "I'm Timo — a 11-year-old web developer from Denmark. I built this entire website from scratch using React and deployed it on Cloudflare Pages. It's been a really fun project." },
+      { "type": "heading", "text": "What I'll write about" },
+      { "type": "paragraph", "text": "Mostly things I'm learning. Right now that includes React, JavaScript, and CSS — but also things like climbing (I just started lead climbing!) and general life stuff." },
+      { "type": "quote", "text": "Start before you're ready. That's the only way you'll ever start." },
+      { "type": "paragraph", "text": "I'm going to try to post whenever something cool happens or I learn something new. No pressure, no schedule. Just vibes." },
+      { "type": "heading", "text": "How this blog works" },
+      { "type": "paragraph", "text": "There's no CMS or database. Posts are hardcoded in a JSON file directly in the source code. Want to add a post? Edit the JSON. Simple as that." },
+      { "type": "code", "language": "json", "text": "{\n  \"slug\": \"my-post\",\n  \"title\": \"My New Post\",\n  \"date\": \"2026-05-01\",\n  \"tags\": [\"cool\", \"stuff\"],\n  \"content\": [...]\n}" },
+      { "type": "paragraph", "text": "Anyway, that's it for the first post. Thanks for reading. Sign my guestbook on the home page if you want to leave a message! 📖" }
+    ]
+  },
+  {
+    "id": "2",
+    "slug": "first-lead-climb",
+    "title": "I Climbed My First Lead Route",
+    "date": "2026-04-22",
+    "tags": ["climbing", "personal"],
+    "excerpt": "I finally got permission to lead climb at NKL. Clipping quickdraws, managing rope, and trying not to fall — here's how it went.",
+    "coverEmoji": "🧗‍♂️",
+    "content": [
+      { "type": "paragraph", "text": "A few weeks ago I got permission to lead climb at Næstved Klatre Klub (NKL). Lead climbing means you're clipping the rope into quickdraws as you go up — instead of the rope already being at the top." },
+      { "type": "paragraph", "text": "It's a bit scarier because if you fall, you fall further. But honestly? It felt amazing." },
+      { "type": "heading", "text": "What is lead climbing anyway?" },
+      { "type": "paragraph", "text": "In top-rope climbing, the rope goes up through an anchor at the top and back down to you. If you fall, you barely move. In lead climbing, you're attached to the rope at the bottom, and you clip it into pre-placed quickdraws as you climb. A fall means dropping about twice the distance to the last clip." },
+      { "type": "quote", "text": "The first clip is always the scariest. After that, you just climb." },
+      { "type": "paragraph", "text": "My first lead route was a 4a. Pretty easy grade, but it didn't feel easy when I was up there managing the rope! I also hit my head when the rope came down at the end 😂" },
+      { "type": "heading", "text": "What's next" },
+      { "type": "paragraph", "text": "I want to try a 5a lead route next time. I've already done 5a on top-rope so the movement isn't new, it's just the head game of leading. Fingers crossed!" }
+    ]
+  },
+  {
+    "id": "3",
+    "slug": "building-this-site",
+    "title": "How I Built This Website (At Age 10)",
+    "date": "2026-04-24",
+    "tags": ["web dev", "react", "cloudflare"],
+    "excerpt": "React, Cloudflare Pages, Workers, D1 SQLite, CAPTCHA, ban systems — here's the full story of how this personal site came to be.",
+    "coverEmoji": "💻",
+    "content": [
+      { "type": "paragraph", "text": "This site started as a simple React app. Now it has a guestbook, an admin panel, a ban system, CAPTCHA verification, a blog, and deploys to Cloudflare's edge network. Let me walk you through it." },
+      { "type": "heading", "text": "The stack" },
+      { "type": "paragraph", "text": "Frontend: React + Vite. Backend: Cloudflare Pages Functions (serverless). Database: Cloudflare D1 (SQLite at the edge). CAPTCHA: Cloudflare Turnstile. Animations: Framer Motion." },
+      { "type": "code", "language": "bash", "text": "# Deploy command\nnpm run deploy\n\n# Which runs:\nvite build && wrangler pages deploy dist" },
+      { "type": "heading", "text": "The guestbook" },
+      { "type": "paragraph", "text": "The guestbook was the first real feature. It lets visitors type their name and click 'Sign'. Names are stored in a D1 SQLite database. There's CAPTCHA to stop bots, a honeypot field, and a bad-words filter." },
+      { "type": "heading", "text": "The admin panel" },
+      { "type": "paragraph", "text": "At /admin there's a full admin panel where I can see all submissions, ban IPs or ASNs, lock the guestbook, and manage settings. It's password-protected via a Cloudflare Worker." },
+      { "type": "quote", "text": "Building your own tooling is the best way to learn. You get stuck, you figure it out, and you understand why things work the way they do." },
+      { "type": "paragraph", "text": "If you want to know more about any specific part, feel free to reach out at timongogoyt@ferendovych.uk. I'm happy to talk about it!" }
+    ]
+  }
+]
