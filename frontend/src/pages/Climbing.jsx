@@ -500,7 +500,12 @@ const styles = {
     fontSize: "clamp(2rem, 6vw, 3rem)",
     textAlign: "center",
     marginBottom: "3rem",
-    color: "inherit",
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    background: "linear-gradient(135deg, #c4b5fd 0%, #818cf8 50%, #a5f3fc 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
   },
   adventuresGrid: {
     display: "grid",
@@ -509,15 +514,16 @@ const styles = {
     marginBottom: "4rem",
   },
   adventureCard: {
-    backgroundColor: "rgba(100, 108, 255, 0.05)",
+    backgroundColor: "rgba(124, 58, 237, 0.03)",
     borderRadius: "20px",
     overflow: "hidden",
-    border: "1px solid rgba(100, 108, 255, 0.1)",
+    border: "1px solid rgba(124, 58, 237, 0.12)",
     cursor: "pointer",
     transition: "all 0.1s ease",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
   },
   adventureGrade: {
-    backgroundColor: "#646cff",
+    background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
     color: "white",
     padding: "0.4rem 1rem",
     borderRadius: "20px",
@@ -525,6 +531,7 @@ const styles = {
     fontWeight: "600",
     whiteSpace: "nowrap",
     marginLeft: "1rem",
+    boxShadow: "0 2px 8px rgba(124,58,237,0.35)",
   },
   adventureContent: {
     padding: "2rem",
@@ -589,10 +596,11 @@ const styles = {
   statCard: {
     textAlign: "center",
     padding: "2rem 1rem",
-    borderRadius: "15px",
-    backgroundColor: "rgba(100, 108, 255, 0.05)",
-    border: "1px solid rgba(100, 108, 255, 0.1)",
+    borderRadius: "16px",
+    backgroundColor: "rgba(124, 58, 237, 0.05)",
+    border: "1px solid rgba(124, 58, 237, 0.14)",
     cursor: "pointer",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
   },
   statIcon: {
     fontSize: "3rem",
@@ -601,7 +609,10 @@ const styles = {
   statValue: {
     fontSize: "2rem",
     fontWeight: "700",
-    color: "#646cff",
+    background: "linear-gradient(135deg, #c4b5fd 0%, #818cf8 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
     marginBottom: "0.5rem",
   },
   statLabel: {

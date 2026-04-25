@@ -10,7 +10,6 @@ export default function ThemeToggle({ darkMode, toggleMode, topOffset = 20 }) {
         style={{
           ...styles.toggleCircle,
           marginLeft: darkMode ? "32px" : "2px",
-          backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
         }}
       >
         <span style={styles.icon}>{darkMode ? "🌙" : "☀️"}</span>
@@ -23,10 +22,11 @@ const styles = {
   toggleWrapper: {
     position: "fixed",
     left: "20px",
-    width: "60px",
-    height: "30px",
-    borderRadius: "30px",
-    backgroundColor: "#888",
+    width: "62px",
+    height: "32px",
+    borderRadius: "32px",
+    background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
+    boxShadow: "0 2px 12px rgba(124,58,237,0.4)",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -34,9 +34,11 @@ const styles = {
     zIndex: 10,
   },
   toggleCircle: {
-    width: "26px",
-    height: "26px",
+    width: "28px",
+    height: "28px",
     borderRadius: "50%",
+    background: "rgba(255,255,255,0.92)",
+    boxShadow: "0 1px 6px rgba(0,0,0,0.25)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
