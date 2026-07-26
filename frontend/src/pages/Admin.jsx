@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { buildPhotoPayload } from '../utils/photography';
 
 export default function Admin() {
   const [password, setPassword] = useState('');
@@ -34,6 +35,11 @@ export default function Admin() {
   const [hideNavigationEnabled, setHideNavigationEnabled] = useState(false);
   const [diagnostics, setDiagnostics] = useState(null);
   const [operationsData, setOperationsData] = useState(null);
+  const [photoTitle, setPhotoTitle] = useState('');
+  const [photoCaption, setPhotoCaption] = useState('');
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   useEffect(() => {
     const storedKey = sessionStorage.getItem('adminKey');
@@ -385,6 +391,66 @@ export default function Admin() {
       }
     } catch (error) {
       setStatus('Network error');
+    }
+  };
+
+  const handlePhotoFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setPhotoFile(null);
+      setPhotoPreview('');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setStatus('Please select an image file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPhotoFile(file);
+      setPhotoPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadPhoto = async () => {
+    if (!photoPreview) {
+      setStatus('Choose an image to upload first.');
+      return;
+    }
+
+    try {
+      setPhotoUploading(true);
+      const payload = buildPhotoPayload({
+        title: photoTitle,
+        caption: photoCaption,
+        imageData: photoPreview,
+        mimeType: photoFile?.type || 'image/jpeg',
+      });
+
+      const response = await fetch('/api/photography', {
+        method: 'POST',
+        headers: getAuthHeaders(password, { 'Content-Type': 'application/json' }),
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      setStatus('Photo uploaded successfully.');
+      setPhotoTitle('');
+      setPhotoCaption('');
+      setPhotoFile(null);
+      setPhotoPreview('');
+      setTimeout(() => setStatus(''), 3000);
+    } catch (error) {
+      setStatus(error.message || 'Network error uploading photo');
+    } finally {
+      setPhotoUploading(false);
     }
   };
 
@@ -914,7 +980,36 @@ export default function Admin() {
 
         {activeTab === 'website' && (
           <div style={styles.sectionCard}>
-            <h3 style={styles.sectionHeading}>Website Controls</h3>
+            <h3 style={styles.sectionHeading}>Photography Upload</h3>
+            <div style={styles.controlRow}>
+              <input
+                type="text"
+                value={photoTitle}
+                onChange={(e) => setPhotoTitle(e.target.value)}
+                placeholder="Photo title"
+                style={styles.configInput}
+              />
+            </div>
+            <textarea
+              value={photoCaption}
+              onChange={(e) => setPhotoCaption(e.target.value)}
+              placeholder="Short caption"
+              style={styles.textArea}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoFileChange}
+              style={{ marginBottom: '0.8rem' }}
+            />
+            {photoPreview && (
+              <img src={photoPreview} alt="Preview" style={styles.photoPreview} />
+            )}
+            <button onClick={handleUploadPhoto} style={styles.button} disabled={photoUploading}>
+              {photoUploading ? 'Uploading…' : 'Upload to Photography Page'}
+            </button>
+
+            <h3 style={{ ...styles.sectionHeading, marginTop: '1.5rem' }}>Website Controls</h3>
             <label style={styles.checkboxRow}>
               <input
                 type="checkbox"
@@ -1290,6 +1385,14 @@ const styles = {
     gap: '0.5rem',
     marginBottom: '0.8rem',
     color: '#fff',
+  },
+  photoPreview: {
+    width: '100%',
+    maxHeight: '280px',
+    objectFit: 'cover',
+    borderRadius: '12px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    marginBottom: '0.8rem',
   },
   textArea: {
     width: '100%',

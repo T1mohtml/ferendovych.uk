@@ -11,6 +11,7 @@ export default function Navigation({ topOffset = 0, darkMode = false }) {
     { path: "/climbing", label: "Climbing", icon: "🧗‍♂️" },
     { path: "/coding", label: "Coding", icon: "💻" },
     { path: "/blog", label: "Blog", icon: "✍️" },
+    { path: "/photography", label: "Photography", icon: "📷" },
   ];
 
   return (

@@ -8,6 +8,7 @@ import Navigation from "./components/Navigation.jsx";
 import Coding from "./pages/coding.jsx";
 import Blog from "./pages/Blog.jsx";
 import BlogPost from "./pages/BlogPost.jsx";
+import Photography from "./pages/Photography.jsx";
 
 function AppShell({ darkMode, toggleMode }) {
   const location = useLocation();
@@ -101,6 +102,7 @@ function AppShell({ darkMode, toggleMode }) {
         <Route path="/coding" element={<Coding darkMode={darkMode} />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/photography" element={<Photography />} />
       </Routes>
     </>
   );
